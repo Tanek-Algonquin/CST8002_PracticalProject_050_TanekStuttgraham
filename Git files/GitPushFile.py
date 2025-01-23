@@ -12,7 +12,7 @@ if repo.is_dirty() or repo.untracked_files:
     repo.git.add(A=True)  # Add all changes (modified and untracked files)
     
     # Commit the changes
-    commit_message = "Second automated commit from Thonny for my Practical Project. Including a DTO for Facilities and an incomplete CSV reader class"
+    commit_message = "Third automated commit from Thonny for my Practical Project. Added getters and setters to facility Class"
     repo.index.commit(commit_message)
     
     # Print commit message
