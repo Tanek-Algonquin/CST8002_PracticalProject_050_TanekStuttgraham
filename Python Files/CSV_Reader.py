@@ -1,6 +1,6 @@
 import csv
 from facilityClass import facilityClass
-"""This file (CSV_READER) was written by Tanek Stuttgraham Student No 041012512"""
+"""This file (CSV_READER) was written by Tanek Stuttgraham Student No 041012512, Course Code: CST8002_050, Prof. Todd Keuleman"""
 # List to store facility objects
 record_list = []
 

@@ -1,5 +1,5 @@
 from git import Repo
-"""This file (GitRepoFile) was written by Tanek Stuttgraham Student No 041012512"""
+"""This file (GitRepoFile) was written by Tanek Stuttgraham Student No 041012512, Course Code: CST8002_050, Prof. Todd Keuleman"""
 # Define the URL of the repository and the local path where it should be cloned
 repo_url = "https://github.com/Tanek-Algonquin/CST8002_PracticalProject_050_TanekStuttgraham"
 repo_path = "C:\AAFINAL-SEMESTER\Programming Language Research Project\Practical_Project"  # Set the local directory path for the clone
