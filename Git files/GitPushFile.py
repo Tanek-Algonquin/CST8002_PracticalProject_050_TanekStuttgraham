@@ -1,5 +1,5 @@
 from git import Repo
-"""This file (GitPushFile) was written by Tanek Stuttgraham Student No 041012512"""
+"""This file (GitPushFile) was written by Tanek Stuttgraham Student No 041012512, Course Code: CST8002_050, Prof. Todd Keuleman"""
 # Define the path to local repository
 repo_path = r"C:\AAFINAL-SEMESTER\Programming Language Research Project\Practical_Project"  
 
@@ -17,7 +17,7 @@ Push changes to remote repository.
     # Stage all changes (including untracked files)
     repo.git.add(A=True)  # Add all changes (modified and untracked files)
     # Commit the changes
-    commit_message = "Fifth and final automated commit for my Practical Project. Finalized developer comments."
+    commit_message = "Sixth and actual final commit. Added course code and proffessor name source code comments."
     repo.index.commit(commit_message)
     # Print commit message
     print(f"Committed changes with message: {commit_message}")
