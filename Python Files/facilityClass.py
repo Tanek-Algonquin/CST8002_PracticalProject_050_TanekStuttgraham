@@ -1,5 +1,6 @@
 class facilityClass:
     """
+This file (facilityClass) was written by Tanek Stuttgraham Student No 041012512
  This class represents a liscenced childcare facility found in the csv dataset provided.
   Attributes:
  -region (str) : The region where this facility is located.

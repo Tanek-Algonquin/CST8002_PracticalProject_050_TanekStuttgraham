@@ -1,5 +1,5 @@
 from git import Repo
-
+"""This file (GitPushFile) was written by Tanek Stuttgraham Student No 041012512"""
 # Define the path to local repository
 repo_path = r"C:\AAFINAL-SEMESTER\Programming Language Research Project\Practical_Project"  
 
@@ -14,17 +14,13 @@ We stage (add) changes to repo. Commit changes with commit message.
 Compare this commit with the last commit and list files that had changes.
 Push changes to remote repository.
 """
-    
     # Stage all changes (including untracked files)
     repo.git.add(A=True)  # Add all changes (modified and untracked files)
-    
     # Commit the changes
-    commit_message = "Fourth automated commit for my Practical Project. Cleaned Code, Added developers Comments. Hopefully the last commit for this project."
+    commit_message = "Fifth and final automated commit for my Practical Project. Finalized developer comments."
     repo.index.commit(commit_message)
-    
     # Print commit message
     print(f"Committed changes with message: {commit_message}")
-    
     # Check if there is more than one commit to compare with
     if len(list(repo.iter_commits())) > 1:
         # Print files that were modified or added in the commit
