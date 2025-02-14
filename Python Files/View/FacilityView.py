@@ -1,6 +1,6 @@
 import tkinter as tk
-from tkinter import messagebox
-from Controller.FacilityController import FacilityController # Import Controller
+from tkinter import ttk, messagebox
+from Controller.FacilityController import FacilityController  # Import Controller
 
 
 class FacilityView:
@@ -9,10 +9,30 @@ class FacilityView:
         self.root = root
         self.controller = controller
         self.root.title("Facility Management System")
-        
-        # Create a listbox to display facilities
-        self.facility_listbox = tk.Listbox(self.root, width=50, height=10)
-        self.facility_listbox.grid(row=0, column=0, columnspan=4, padx=10, pady=10)
+
+        # Defining columns makes building view easier
+        self.columns = [
+            "Region", "District", "License Number", "Facility Name", "Facility Type",
+            "Facility Address 1", "Facility Address 2", "Facility Address 3",
+            "Max Number of Children", "Max Number of Infants", "Max Number of Preschool-Aged Children",
+            "Max Number of School Age Children", "Language of Service", "Operator Id", "Designated Facility"
+        ]
+
+        # Create a TreeView Widget
+        self.facility_tree = ttk.Treeview(self.root, columns=self.columns, show="headings", height=10)
+
+        # Pass column headers to row building loop
+        for col in self.columns:
+            self.facility_tree.heading(col, text=col)
+            self.facility_tree.column(col, width=120, anchor="center")
+
+        # Sticky nsew lets grid expand in any direction
+        self.facility_tree.grid(row=0, column=0, columnspan=4, padx=10, pady=10, sticky="nsew")
+
+        # Add scrollbar to the TreeView
+        self.scrollbar = ttk.Scrollbar(self.root, orient="vertical", command=self.facility_tree.yview)
+        self.facility_tree.configure(yscroll=self.scrollbar.set)
+        self.scrollbar.grid(row=0, column=4, sticky="ns")
 
         # Create buttons for various actions
         self.create_buttons()
@@ -49,45 +69,33 @@ class FacilityView:
         self.entry_fields = {}
 
         # Labels and Entry fields for each facility attribute
-        attributes = [
-            "Region", "District", "License Number", "Facility Name", "Facility Type",
-            "Facility Address 1", "Facility Address 2", "Facility Address 3",
-            "Max Number of Children", "Max Number of Infants", "Max Number of Preschool-Aged Children",
-            "Max Number of School Age Children", "Language of Service", "Operator Id", "Designated Facility"
-        ]
-
-        for i, attribute in enumerate(attributes):
+        for i, attribute in enumerate(self.columns):
             label = tk.Label(add_window, text=attribute)
             label.grid(row=i, column=0, padx=5, pady=2, sticky="w")
-            
+
             entry = tk.Entry(add_window, width=40)
             entry.grid(row=i, column=1, padx=5, pady=2)
-            self.entry_fields[attribute] = entry  
+            self.entry_fields[attribute] = entry
 
         # Submit button
         submit_button = tk.Button(add_window, text="Submit", command=lambda: self.add_facility(add_window))
-        submit_button.grid(row=len(attributes), column=0, columnspan=2, pady=10)
+        submit_button.grid(row=len(self.columns), column=0, columnspan=2, pady=10)
 
     def add_facility(self, window):
         """Retrieve input values, create a facility object, and add it to the model."""
         facility_data = {}
 
         try:
-            facility_data["Region"] = self.entry_fields["Region"].get()
-            facility_data["District"] = self.entry_fields["District"].get()
-            facility_data["License Number"] = self.entry_fields["License Number"].get()
-            facility_data["Facility Name"] = self.entry_fields["Facility Name"].get()
-            facility_data["Facility Type"] = self.entry_fields["Facility Type"].get()
-            facility_data["Facility Address 1"] = self.entry_fields["Facility Address 1"].get()
-            facility_data["Facility Address 2"] = self.entry_fields["Facility Address 2"].get()
-            facility_data["Facility Address 3"] = self.entry_fields["Facility Address 3"].get()
-            facility_data["Max Number of Children"] = int(self.entry_fields["Max Number of Children"].get())
-            facility_data["Max Number of Infants"] = int(self.entry_fields["Max Number of Infants"].get())
-            facility_data["Max Number of Preschool-Aged Children"] = int(self.entry_fields["Max Number of Preschool-Aged Children"].get())
-            facility_data["Max Number of School Age Children"] = int(self.entry_fields["Max Number of School Age Children"].get())
-            facility_data["Language of Service"] = self.entry_fields["Language of Service"].get()
-            facility_data["Operator Id"] = self.entry_fields["Operator Id"].get()
-            facility_data["Designated Facility"] = self.entry_fields["Designated Facility"].get()
+            for key in self.columns:
+                facility_data[key] = self.entry_fields[key].get()
+
+            # Convert numerical values for child capacities
+            numerical_keys = [
+                "Max Number of Children", "Max Number of Infants", "Max Number of Preschool-Aged Children",
+                "Max Number of School Age Children"
+            ]
+            for key in numerical_keys:
+                facility_data[key] = int(facility_data[key])
 
             # Send facility data to controller
             self.controller.add_facility(facility_data)
@@ -101,16 +109,30 @@ class FacilityView:
 
     def delete_facility(self):
         """Delete the selected facility."""
-        try:
-            selected_index = self.facility_listbox.curselection()[0]
-            self.controller.delete_facility(selected_index)
-            self.update_facility_list()
-        except IndexError:
+        selected_item = self.facility_tree.selection()
+        if not selected_item:
             messagebox.showwarning("No Selection", "Please select a facility to delete.")
+            return
+
+        # Get selected item details
+        selected_index = self.facility_tree.index(selected_item)
+        self.controller.delete_facility(selected_index)
+
+        # Refresh list
+        self.update_facility_list()
 
     def update_facility_list(self):
-        """Update the listbox with the latest facilities."""
-        self.facility_listbox.delete(0, tk.END)
-        for facility in self.controller.model.record_list:
-            self.facility_listbox.insert(tk.END, f"{facility.facilityName} - {facility.district}")
+        """Update the Treeview with the latest facilities."""
+        # Clear the existing entries in the Treeview
+        for item in self.facility_tree.get_children():
+            self.facility_tree.delete(item)
 
+        # Insert new facility data
+        for facility in self.controller.model.record_list:
+            self.facility_tree.insert("", "end", values=[
+                facility.region, facility.district, facility.licenseNum,
+                facility.facilityName, facility.facilityType, facility.facilityAddress1,
+                facility.facilityAddress2, facility.facilityAddress3, facility.maxNumofChildren,
+                facility.maxNumInfants, facility.maxNumPreChildren, facility.maxNumSAgeChildren,
+                facility.LangOfService, facility.operatorId, facility.designatedFacility
+            ])
