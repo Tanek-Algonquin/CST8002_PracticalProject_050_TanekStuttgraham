@@ -18,7 +18,7 @@ if repo.is_dirty() or repo.untracked_files:
     repo.git.add(A=True)  # Add all changes (modified and untracked files)
     
     # Commit the changes
-    commit_message = "Changed FacilityView and associated methods from using a List to using a TreeView for neater display. "
+    commit_message = "Modified Facility View to show only important variables to have UI be a little cleaner. Added More details page to show all facility details."
     repo.index.commit(commit_message)
     
     # Print commit message

@@ -8,26 +8,23 @@ class FacilityView:
         """Initialize the view with the main window and connect it to the controller."""
         self.root = root
         self.controller = controller
-        self.root.title("Facility Management System")
+        self.root.title("Tanek Stuttgraham's Facility Management System 041012512")
 
         # Defining columns makes building view easier
-        self.columns = [
-            "Region", "District", "License Number", "Facility Name", "Facility Type",
-            "Facility Address 1", "Facility Address 2", "Facility Address 3",
-            "Max Number of Children", "Max Number of Infants", "Max Number of Preschool-Aged Children",
-            "Max Number of School Age Children", "Language of Service", "Operator Id", "Designated Facility"
-        ]
+        self.displayed_columns = [
+            "Facility Name", "Facility Type", "Region", "District", "Max Number of Children"
+            ]
 
         # Create a TreeView Widget
-        self.facility_tree = ttk.Treeview(self.root, columns=self.columns, show="headings", height=10)
+        self.facility_tree = ttk.Treeview(self.root, columns=self.displayed_columns, show="headings", height=10)
 
         # Pass column headers to row building loop
-        for col in self.columns:
+        for col in self.displayed_columns:
             self.facility_tree.heading(col, text=col)
-            self.facility_tree.column(col, width=120, anchor="center")
+            self.facility_tree.column(col, width=150, anchor="center")
 
         # Sticky nsew lets grid expand in any direction
-        self.facility_tree.grid(row=0, column=0, columnspan=4, padx=10, pady=10, sticky="nsew")
+        self.facility_tree.grid(row=0, column=0, columnspan=4, padx=9, pady=10, sticky="nsew")
 
         # Add scrollbar to the TreeView
         self.scrollbar = ttk.Scrollbar(self.root, orient="vertical", command=self.facility_tree.yview)
@@ -50,7 +47,55 @@ class FacilityView:
 
         self.delete_button = tk.Button(self.root, text="Delete Facility", command=self.delete_facility)
         self.delete_button.grid(row=1, column=3, padx=5, pady=5)
+        
+        self.show_more_button = tk.Button(self.root, text="Show More Details", command=self.show_more_details)
+        self.show_more_button.grid(row=1, column=4, padx=5, pady=5)
+        
+        
+    def show_more_details(self):
+        """Open a window with full facility data shown."""
+        selected_row = self.facility_tree.selection()
+        if not selected_row:
+            messagebox.showwarning("Nothing Selected", "Select a facility and retry.")
+            return
+        
+        selected_i = self.facility_tree.index(selected_row)
+        facility = self.controller.model.record_list[selected_i]
+        
+        details_window = tk.Toplevel(self.root)
+        details_window.title("Tanek Stuttgrahams Details for {facility.facilityName} page 041012512")
+        # Create a frame to contain the labels
+        frame = tk.Frame(details_window)
+        frame.pack(padx=50, pady=40)
+        #Label Keys and Data
+        details_list = [
+            ("Region", facility.region),
+        ("District", facility.district),
+        ("License Number", facility.licenseNum),
+        ("Facility Name", facility.facilityName),
+        ("Facility Type", facility.facilityType),
+        ("Primary Address", facility.facilityAddress1),
+        ("Secondary Address", facility.facilityAddress2),
+        ("Tertiary Address", facility.facilityAddress3),
+        ("Max Number of Children", facility.maxNumofChildren),
+        ("Max Number of Infants", facility.maxNumInfants),
+        ("Max Number of Preschool-Aged Children", facility.maxNumPreChildren),
+        ("Max Number of School-Aged Children", facility.maxNumSAgeChildren),
+        ("Language of Service", facility.LangOfService),
+        ("Operator ID", facility.operatorId),
+        ("Designated Facility", facility.designatedFacility)
+    ]
+        # Create labels for each detail
+        row = 0
+        for label, value in details_list:
+            tk.Label(frame, text=f"{label}: {value}", anchor="w", width=40, justify="left").grid(row=row, column=0, padx=5, pady=10, sticky="w")
+            row += 1
 
+        # Add a close button at the bottom
+        close_button = tk.Button(details_window, text="Close", command=details_window.destroy)
+        close_button.pack(pady=10)
+        
+            
     def load_facilities(self):
         """Call the controller's method to load facilities."""
         self.controller.load_facilities()
@@ -130,9 +175,5 @@ class FacilityView:
         # Insert new facility data
         for facility in self.controller.model.record_list:
             self.facility_tree.insert("", "end", values=[
-                facility.region, facility.district, facility.licenseNum,
-                facility.facilityName, facility.facilityType, facility.facilityAddress1,
-                facility.facilityAddress2, facility.facilityAddress3, facility.maxNumofChildren,
-                facility.maxNumInfants, facility.maxNumPreChildren, facility.maxNumSAgeChildren,
-                facility.LangOfService, facility.operatorId, facility.designatedFacility
+                facility.facilityName, facility.facilityType, facility.region,  facility.district,  facility.maxNumofChildren
             ])
