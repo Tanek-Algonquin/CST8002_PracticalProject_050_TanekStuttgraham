@@ -42,6 +42,8 @@ class FacilityController:
         
         except ValueError:
             print("Error: Please enter valid numerical values for child capacities.")
+            
+
 
     def delete_facility(self, index):
         """Delete a facility from the model based on index."""

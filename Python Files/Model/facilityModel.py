@@ -1,5 +1,5 @@
 import csv
-from facilityClass import facilityClass
+from Model.facilityClass import facilityClass
 """This file (FacilityModel) was written by Tanek Stuttgraham Student No 041012512, Course Code: CST8002_050, Prof. Todd Keuleman"""
 
 # File path to the CSV

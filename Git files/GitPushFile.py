@@ -18,7 +18,7 @@ if repo.is_dirty() or repo.untracked_files:
     repo.git.add(A=True)  # Add all changes (modified and untracked files)
     
     # Commit the changes
-    commit_message = "Second Push of second practical project. Added initial Controller class."
+    commit_message = "Created a View window using tkinter. Created a app.py file that acts as our main. "
     repo.index.commit(commit_message)
     
     # Print commit message
