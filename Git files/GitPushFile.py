@@ -18,7 +18,7 @@ if repo.is_dirty() or repo.untracked_files:
     repo.git.add(A=True)  # Add all changes (modified and untracked files)
     
     # Commit the changes
-    commit_message = "First Push of second practical project. Added MVC Folder structure. Modified CSVReader class to be FacilityModel class."
+    commit_message = "Second Push of second practical project. Added initial Controller class."
     repo.index.commit(commit_message)
     
     # Print commit message
