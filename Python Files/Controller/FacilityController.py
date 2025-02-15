@@ -11,6 +11,12 @@ class FacilityController:
         """Load facilities from CSV into the model."""
         self.model.load_from_csv()
         self.view.update_facility_list()
+        
+    def load_one_facility(self, index):
+        """Loads one facility from CSV into memory"""
+        self.model.load_one_from_csv(index)
+        self.view.update_facility_list()
+    
 
     def save_facilities(self):
         """Save facilities from the model to CSV."""

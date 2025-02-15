@@ -9,11 +9,11 @@ class FacilityView:
         self.root = root
         self.controller = controller
         self.root.title("Tanek Stuttgraham's Facility Management System 041012512")
-
+        self.current_index = None
         # Defining columns makes building view easier
         self.displayed_columns = [
             "Facility Name", "Facility Type", "Region", "District", "Max Number of Children"
-            ]
+        ]
 
         # Create a TreeView Widget
         self.facility_tree = ttk.Treeview(self.root, columns=self.displayed_columns, show="headings", height=10)
@@ -36,66 +36,182 @@ class FacilityView:
 
     def create_buttons(self):
         """Create buttons to interact with the controller."""
+        
         self.load_button = tk.Button(self.root, text="Load Facilities", command=self.load_facilities)
         self.load_button.grid(row=1, column=0, padx=5, pady=5)
 
+        self.next_button = tk.Button(self.root,  text="Load One Record", command=self.load_one_record)
+        self.next_button.grid(row=1, column=1, padx=5, pady=5)
+
+        self.next_button.grid(row=1, column=1, padx=5, pady=5)
+
         self.save_button = tk.Button(self.root, text="Save Facilities", command=self.save_facilities)
-        self.save_button.grid(row=1, column=1, padx=5, pady=5)
+        self.save_button.grid(row=1, column=2, padx=5, pady=5)
 
         self.add_button = tk.Button(self.root, text="Add Facility", command=self.open_add_facility_window)
-        self.add_button.grid(row=1, column=2, padx=5, pady=5)
+        self.add_button.grid(row=1, column=3, padx=5, pady=5)
 
         self.delete_button = tk.Button(self.root, text="Delete Facility", command=self.delete_facility)
-        self.delete_button.grid(row=1, column=3, padx=5, pady=5)
-        
+        self.delete_button.grid(row=1, column=4, padx=5, pady=5)
+
         self.show_more_button = tk.Button(self.root, text="Show More Details", command=self.show_more_details)
-        self.show_more_button.grid(row=1, column=4, padx=5, pady=5)
+        self.show_more_button.grid(row=1, column=5, padx=5, pady=5)
         
-        
+    def load_one_record(self):
+        """Load the selected facility or the first one if none is selected."""
+        selected_row = self.facility_tree.selection()
+        index = 0  # Default to first facility if nothing is selected
+        if selected_row:
+            index = self.facility_tree.index(selected_row)  # Get index of selected row
+        self.controller.load_one_facility(index)
+            
     def show_more_details(self):
         """Open a window with full facility data shown."""
         selected_row = self.facility_tree.selection()
         if not selected_row:
             messagebox.showwarning("Nothing Selected", "Select a facility and retry.")
             return
-        
+
         selected_i = self.facility_tree.index(selected_row)
+        self.current_index = selected_i  #Grabs Number
         facility = self.controller.model.record_list[selected_i]
-        
+
         details_window = tk.Toplevel(self.root)
-        details_window.title("Tanek Stuttgrahams Details for {facility.facilityName} page 041012512")
+        details_window.title(f"Tanek Stuttgraham's Details for {facility.facilityName} page 041012512")
         # Create a frame to contain the labels
         frame = tk.Frame(details_window)
         frame.pack(padx=50, pady=40)
-        #Label Keys and Data
+        # Label Keys and Data
         details_list = [
             ("Region", facility.region),
-        ("District", facility.district),
-        ("License Number", facility.licenseNum),
-        ("Facility Name", facility.facilityName),
-        ("Facility Type", facility.facilityType),
-        ("Primary Address", facility.facilityAddress1),
-        ("Secondary Address", facility.facilityAddress2),
-        ("Tertiary Address", facility.facilityAddress3),
-        ("Max Number of Children", facility.maxNumofChildren),
-        ("Max Number of Infants", facility.maxNumInfants),
-        ("Max Number of Preschool-Aged Children", facility.maxNumPreChildren),
-        ("Max Number of School-Aged Children", facility.maxNumSAgeChildren),
-        ("Language of Service", facility.LangOfService),
-        ("Operator ID", facility.operatorId),
-        ("Designated Facility", facility.designatedFacility)
-    ]
+            ("District", facility.district),
+            ("License Number", facility.licenseNum),
+            ("Facility Name", facility.facilityName),
+            ("Facility Type", facility.facilityType),
+            ("Primary Address", facility.facilityAddress1),
+            ("Secondary Address", facility.facilityAddress2),
+            ("Tertiary Address", facility.facilityAddress3),
+            ("Max Number of Children", facility.maxNumofChildren),
+            ("Max Number of Infants", facility.maxNumInfants),
+            ("Max Number of Preschool-Aged Children", facility.maxNumPreChildren),
+            ("Max Number of School-Aged Children", facility.maxNumSAgeChildren),
+            ("Language of Service", facility.LangOfService),
+            ("Operator ID", facility.operatorId),
+            ("Designated Facility", facility.designatedFacility)
+        ]
         # Create labels for each detail
         row = 0
         for label, value in details_list:
             tk.Label(frame, text=f"{label}: {value}", anchor="w", width=40, justify="left").grid(row=row, column=0, padx=5, pady=10, sticky="w")
             row += 1
 
+        # Adds a next Buttom to the bottom
+        next_button = tk.Button(details_window, text="Next Record", command=lambda: self.show_more_details_by_index(self.current_index+1))
+        next_button.pack(pady=10)
         # Add a close button at the bottom
         close_button = tk.Button(details_window, text="Close", command=details_window.destroy)
         close_button.pack(pady=10)
+        # Adds a previous Buttom to the bottom
+        previous_button = tk.Button(details_window, text="Previous Record", command=lambda: self.show_more_details_by_index(self.current_index-1))
+        previous_button.pack(pady=10)
         
+        
+
+    def show_more_details_by_index(self, index):
+        """Shows facility Details page based on index, used by Next and Previous."""
+        # Ensure index is within valid range
+        if index < 0 or index >= len(self.controller.model.record_list):
+            return  # Do nothing if out of bounds
+
+        self.current_index = index  # Update the index before opening the new window
+        facility = self.controller.model.record_list[self.current_index]
             
+        details_window = tk.Toplevel(self.root)
+        details_window.title(f"Tanek Stuttgraham's Details for {facility.facilityName} page 041012512")
+
+        # Create a frame to contain the labels
+        frame = tk.Frame(details_window)
+        frame.pack(padx=50, pady=40)
+        
+
+        # Label Keys and Data
+        details_list = [
+            ("Region", facility.region),
+            ("District", facility.district),
+            ("License Number", facility.licenseNum),
+            ("Facility Name", facility.facilityName),
+            ("Facility Type", facility.facilityType),
+            ("Primary Address", facility.facilityAddress1),
+            ("Secondary Address", facility.facilityAddress2),
+            ("Tertiary Address", facility.facilityAddress3),
+            ("Max Number of Children", facility.maxNumofChildren),
+            ("Max Number of Infants", facility.maxNumInfants),
+            ("Max Number of Preschool-Aged Children", facility.maxNumPreChildren),
+            ("Max Number of School-Aged Children", facility.maxNumSAgeChildren),
+            ("Language of Service", facility.LangOfService),
+            ("Operator ID", facility.operatorId),
+            ("Designated Facility", facility.designatedFacility)
+        ]
+
+        # Create labels for each detail
+        row = 0
+        for label, value in details_list:
+            tk.Label(frame, text=f"{label}: {value}", anchor="w", width=40, justify="left").grid(row=row, column=0, padx=5, pady=10, sticky="w")
+            row += 1
+        # Adds a next Buttom to the bottom
+        next_button = tk.Button(details_window, text="Next Record", command=lambda: self.show_more_details_by_index(self.current_index+1))
+        next_button.pack(pady=10)
+        # Add a close button at the bottom
+        close_button = tk.Button(details_window, text="Close", command=details_window.destroy)
+        close_button.pack(pady=10)
+        # Adds a previous Buttom to the bottom
+        previous_button = tk.Button(details_window, text="Previous Record", command=lambda: self.show_more_details_by_index(self.current_index-1))
+        previous_button.pack(pady=10)
+
+    def next_record_button(self):
+        """Show the next record or loop back to the first one."""
+        if not self.controller.model.record_list:
+            messagebox.showinfo("No records", "No facilities have been loaded yet.")
+            return
+
+        # Initialize index if not set
+        if self.current_index is None:
+            self.current_index = 0
+        else:
+            # Move to next record, loop back to 0 if at end
+            self.current_index = (self.current_index + 1) % len(self.controller.model.record_list)
+
+        # Show details using index-based function
+        self.show_more_details_by_index(self.current_index)
+
+    def previous_record_button(self):
+        """Show the next record or loop back to the first one."""
+        if not self.controller.model.record_list:
+            messagebox.showinfo("No records", "No facilities have been loaded yet.")
+            return
+
+        # Initialize index if not set
+        if self.current_index is None:
+            self.current_index = 0
+        else:
+            # Move to next record, loop back to 0 if at end
+            self.current_index = (self.current_index - 1) % len(self.controller.model.record_list)
+
+        # Show details using index-based function
+        self.show_more_details_by_index(self.current_index)
+        
+    def load_selected_or_first_record(self):
+            """Load the selected record or the first facility if nothing is selected."""
+            selected_row = self.facility_tree.selection()
+
+            if selected_row:
+                selected_index = self.facility_tree.index(selected_row)
+            else:
+                selected_index = 0  # Default to first facility
+
+            self.show_more_details_by_index(selected_index)
+
+
     def load_facilities(self):
         """Call the controller's method to load facilities."""
         self.controller.load_facilities()
@@ -175,5 +291,5 @@ class FacilityView:
         # Insert new facility data
         for facility in self.controller.model.record_list:
             self.facility_tree.insert("", "end", values=[
-                facility.facilityName, facility.facilityType, facility.region,  facility.district,  facility.maxNumofChildren
+                facility.facilityName, facility.facilityType, facility.region, facility.district, facility.maxNumofChildren
             ])
