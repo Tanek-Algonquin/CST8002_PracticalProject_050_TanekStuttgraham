@@ -18,7 +18,7 @@ if repo.is_dirty() or repo.untracked_files:
     repo.git.add(A=True)  # Add all changes (modified and untracked files)
     
     # Commit the changes
-    commit_message = "Added load one record functionality. Modified facility model, controller and view. Also polished load next/previouse button functionality and displaying my name every ten records read."
+    commit_message = "Fixed Adding Record Problem, ensured all variables used in adding page are consistent."
     repo.index.commit(commit_message)
     
     # Print commit message

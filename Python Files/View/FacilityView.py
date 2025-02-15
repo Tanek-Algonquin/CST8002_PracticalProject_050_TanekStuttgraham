@@ -228,32 +228,39 @@ class FacilityView:
 
         # Dictionary to store entry fields
         self.entry_fields = {}
+        
+        headers = ["Region", "District", "License Number", "Facility Name", "Facility Type",
+           "Facility Address 1", "Facility Address 2", "Facility Address 3",
+           "Max Number of Children", "Max Number of Infants",
+           "Max-Number-of-Preschool-Aged-Children", "Max-Number-of-School-Age-Children",
+           "Language of Service", "Operator Id", "Designated Facility"]
+
 
         # Labels and Entry fields for each facility attribute
-        for i, attribute in enumerate(self.columns):
-            label = tk.Label(add_window, text=attribute)
+        for i, header in enumerate(headers):
+            label = tk.Label(add_window, text=header)
             label.grid(row=i, column=0, padx=5, pady=2, sticky="w")
 
             entry = tk.Entry(add_window, width=40)
             entry.grid(row=i, column=1, padx=5, pady=2)
-            self.entry_fields[attribute] = entry
+            self.entry_fields[header] = entry
 
         # Submit button
         submit_button = tk.Button(add_window, text="Submit", command=lambda: self.add_facility(add_window))
-        submit_button.grid(row=len(self.columns), column=0, columnspan=2, pady=10)
+        submit_button.grid(row=len(headers), column=0, columnspan=2, pady=10)
 
     def add_facility(self, window):
         """Retrieve input values, create a facility object, and add it to the model."""
         facility_data = {}
 
         try:
-            for key in self.columns:
+            for key in self.entry_fields:
                 facility_data[key] = self.entry_fields[key].get()
 
             # Convert numerical values for child capacities
             numerical_keys = [
-                "Max Number of Children", "Max Number of Infants", "Max Number of Preschool-Aged Children",
-                "Max Number of School Age Children"
+                "Max Number of Children", "Max Number of Infants",
+            "Max-Number-of-Preschool-Aged-Children", "Max-Number-of-School-Age-Children"
             ]
             for key in numerical_keys:
                 facility_data[key] = int(facility_data[key])

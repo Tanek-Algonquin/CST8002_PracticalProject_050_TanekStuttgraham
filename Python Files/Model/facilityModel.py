@@ -14,12 +14,14 @@ class FacilityModel:
 
     def load_from_csv(self):
         """Load facility data from the CSV and populate the record list."""
+        self.record_list = []
+        
         try:
             with open(file_path, mode='r') as file:
                 csvFile = csv.DictReader(file)
                 # Loop through each row, limited to 100 records
                 for i, lines in enumerate(csvFile, start=1):
-                    if i <= 100:  # Read only 100 records
+                    if i <= 10:  # Read only 100 records
                         print(f"Records Read According To Tanek Stuttgraham 041012512 --> {i}")
                         # Print the message after every 10 records
                         if i % 10 == 0:

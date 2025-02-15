@@ -36,8 +36,8 @@ class FacilityController:
                 facilityAddress3=facility_data["Facility Address 3"],
                 maxNumofChildren=int(facility_data["Max Number of Children"]),
                 maxNumInfants=int(facility_data["Max Number of Infants"]),
-                maxNumPreChildren=int(facility_data["Max Number of Preschool-Aged Children"]),
-                maxNumSAgeChildren=int(facility_data["Max Number of School Age Children"]),
+                maxNumPreChildren=int(facility_data["Max-Number-of-Preschool-Aged-Children"]),
+                maxNumSAgeChildren=int(facility_data["Max-Number-of-School-Age-Children"]),
                 LangOfService=facility_data["Language of Service"],
                 operatorId=facility_data["Operator Id"],
                 designatedFacility=facility_data["Designated Facility"]
