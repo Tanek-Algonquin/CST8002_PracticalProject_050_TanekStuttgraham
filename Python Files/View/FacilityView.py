@@ -50,12 +50,15 @@ class FacilityView:
 
         self.add_button = tk.Button(self.root, text="Add Facility", command=self.open_add_facility_window)
         self.add_button.grid(row=1, column=3, padx=5, pady=5)
+        
+        self.edit_button = tk.Button(self.root, text="Edit Facility", command=self.open_edit_facility_window)
+        self.edit_button.grid(row=1, column=4, padx=5, pady=5)
 
         self.delete_button = tk.Button(self.root, text="Delete Facility", command=self.delete_facility)
-        self.delete_button.grid(row=1, column=4, padx=5, pady=5)
+        self.delete_button.grid(row=1, column=5, padx=5, pady=5)
 
         self.show_more_button = tk.Button(self.root, text="Show More Details", command=self.show_more_details)
-        self.show_more_button.grid(row=1, column=5, padx=5, pady=5)
+        self.show_more_button.grid(row=1, column=6, padx=5, pady=5)
         
     def load_one_record(self):
         """Load the selected facility or the first one if none is selected."""
@@ -64,18 +67,15 @@ class FacilityView:
         if selected_row:
             index = self.facility_tree.index(selected_row)  # Get index of selected row
         self.controller.load_one_facility(index)
-            
     def show_more_details(self):
         """Open a window with full facility data shown."""
         selected_row = self.facility_tree.selection()
         if not selected_row:
             messagebox.showwarning("Nothing Selected", "Select a facility and retry.")
             return
-
         selected_i = self.facility_tree.index(selected_row)
         self.current_index = selected_i  #Grabs Number
         facility = self.controller.model.record_list[selected_i]
-
         details_window = tk.Toplevel(self.root)
         details_window.title(f"Tanek Stuttgraham's Details for {facility.facilityName} page 041012512")
         # Create a frame to contain the labels
@@ -104,7 +104,6 @@ class FacilityView:
         for label, value in details_list:
             tk.Label(frame, text=f"{label}: {value}", anchor="w", width=40, justify="left").grid(row=row, column=0, padx=5, pady=10, sticky="w")
             row += 1
-
         # Adds a next Buttom to the bottom
         next_button = tk.Button(details_window, text="Next Record", command=lambda: self.show_more_details_by_index(self.current_index+1))
         next_button.pack(pady=10)
@@ -114,26 +113,18 @@ class FacilityView:
         # Adds a previous Buttom to the bottom
         previous_button = tk.Button(details_window, text="Previous Record", command=lambda: self.show_more_details_by_index(self.current_index-1))
         previous_button.pack(pady=10)
-        
-        
-
     def show_more_details_by_index(self, index):
         """Shows facility Details page based on index, used by Next and Previous."""
         # Ensure index is within valid range
         if index < 0 or index >= len(self.controller.model.record_list):
             return  # Do nothing if out of bounds
-
         self.current_index = index  # Update the index before opening the new window
         facility = self.controller.model.record_list[self.current_index]
-            
         details_window = tk.Toplevel(self.root)
         details_window.title(f"Tanek Stuttgraham's Details for {facility.facilityName} page 041012512")
-
         # Create a frame to contain the labels
         frame = tk.Frame(details_window)
         frame.pack(padx=50, pady=40)
-        
-
         # Label Keys and Data
         details_list = [
             ("Region", facility.region),
@@ -152,7 +143,6 @@ class FacilityView:
             ("Operator ID", facility.operatorId),
             ("Designated Facility", facility.designatedFacility)
         ]
-
         # Create labels for each detail
         row = 0
         for label, value in details_list:
@@ -167,21 +157,18 @@ class FacilityView:
         # Adds a previous Buttom to the bottom
         previous_button = tk.Button(details_window, text="Previous Record", command=lambda: self.show_more_details_by_index(self.current_index-1))
         previous_button.pack(pady=10)
-
     def next_record_button(self):
         """Show the next record or loop back to the first one."""
         if not self.controller.model.record_list:
             messagebox.showinfo("No records", "No facilities have been loaded yet.")
             return
-
         # Initialize index if not set
         if self.current_index is None:
             self.current_index = 0
         else:
             # Move to next record, loop back to 0 if at end
             self.current_index = (self.current_index + 1) % len(self.controller.model.record_list)
-
-        # Show details using index-based function
+        # Show details using index-based 
         self.show_more_details_by_index(self.current_index)
 
     def previous_record_button(self):
@@ -224,7 +211,7 @@ class FacilityView:
     def open_add_facility_window(self):
         """Open a separate window to input facility details."""
         add_window = tk.Toplevel(self.root)
-        add_window.title("Add New Facility")
+        add_window.title("Add New Facility Tanek Stuttgraham 041012512")
 
         # Dictionary to store entry fields
         self.entry_fields = {}
@@ -287,6 +274,53 @@ class FacilityView:
         self.controller.delete_facility(selected_index)
 
         # Refresh list
+        self.update_facility_list()
+        
+    def open_edit_facility_window(self):
+        """Opens a window that allows editing facilities"""
+        selected_row = self.facility_tree.selection()
+        if not selected_row:
+            messagebox.showwarning("No Selection", "Please select facility to edit")
+            return
+        
+        selected_i = self.facility_tree.index(selected_row)
+        facility_data = self.controller.get_facility_data(selected_i)
+
+        edit_window = tk.Toplevel(self.root)
+        edit_window.title("Edit Facility Window Tanek Stuttgraham 041012512")
+        
+        self.edit_fields = {}
+        
+        headers = ["Region", "District", "License Number", "Facility Name", "Facility Type",
+           "Facility Address 1", "Facility Address 2", "Facility Address 3",
+           "Max Number of Children", "Max Number of Infants",
+           "Max-Number-of-Preschool-Aged-Children", "Max-Number-of-School-Age-Children",
+           "Language of Service", "Operator Id", "Designated Facility"]
+        
+        # Labels and Entry fields for each facility attribute
+        for i, header in enumerate(headers):
+            label = tk.Label(edit_window, text=header)
+            label.grid(row=i, column=0, padx=5, pady=2, sticky="w")
+          
+            entry = tk.Entry(edit_window, width=40)
+            entry.insert(0, str(facility_data[header]))
+            entry.grid(row=i, column=1, padx=5, pady=2)
+            
+            self.edit_fields[header] = entry
+            
+            
+        # Submit button
+        submit_button = tk.Button(edit_window, text="Submit", command=lambda: self.save_edited_facility(edit_window, selected_i))
+        submit_button.grid(row=len(headers), column=0, columnspan=2, pady=10)
+   
+    def save_edited_facility(self, window, index):
+        """Retrieve edited facility data from the UI and send it to the controller."""
+        facility_data = {key: self.edit_fields[key].get() for key in self.edit_fields}
+
+        # Send the edited data to the controller
+        self.controller.update_facility(index, facility_data)
+
+        window.destroy()
         self.update_facility_list()
 
     def update_facility_list(self):

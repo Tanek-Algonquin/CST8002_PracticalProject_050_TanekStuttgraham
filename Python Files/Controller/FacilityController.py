@@ -49,7 +49,57 @@ class FacilityController:
         except ValueError:
             print("Error: Please enter valid numerical values for child capacities.")
             
+    def get_edited_facility_data(self):
+        """Retrieve edited facility data from the UI."""
+        facility_data = {key: self.edit_fields[key].get() for key in self.edit_fields}
+        return facility_data
+    
+    def get_facility_data(self, index):
+        """Retrieve facility data as a dictionary to send to the view."""
+        if 0 <= index < len(self.model.record_list):
+            facility = self.model.record_list[index]
 
+            return {
+                "Region": facility.region,
+                "District": facility.district,
+                "License Number": facility.licenseNum,
+                "Facility Name": facility.facilityName,
+                "Facility Type": facility.facilityType,
+                "Facility Address 1": facility.facilityAddress1,
+                "Facility Address 2": facility.facilityAddress2,
+                "Facility Address 3": facility.facilityAddress3,
+                "Max Number of Children": facility.maxNumofChildren,
+                "Max Number of Infants": facility.maxNumInfants,
+                "Max-Number-of-Preschool-Aged-Children": facility.maxNumPreChildren,
+                "Max-Number-of-School-Age-Children": facility.maxNumSAgeChildren,
+                "Language of Service": facility.LangOfService,
+                "Operator Id": facility.operatorId,
+                "Designated Facility": facility.designatedFacility
+            }
+        return None
+    
+    def update_facility(self, index, facility_data):
+        """Update an existing facility in the model."""
+        if 0 <= index < len(self.model.record_list):
+            facility = self.model.record_list[index]
+
+            facility.region = facility_data["Region"]
+            facility.district = facility_data["District"]
+            facility.licenseNum = facility_data["License Number"]
+            facility.facilityName = facility_data["Facility Name"]
+            facility.facilityType = facility_data["Facility Type"]
+            facility.facilityAddress1 = facility_data["Facility Address 1"]
+            facility.facilityAddress2 = facility_data["Facility Address 2"]
+            facility.facilityAddress3 = facility_data["Facility Address 3"]
+            facility.maxNumofChildren = int(facility_data["Max Number of Children"])
+            facility.maxNumInfants = int(facility_data["Max Number of Infants"])
+            facility.maxNumPreChildren = int(facility_data["Max-Number-of-Preschool-Aged-Children"])
+            facility.maxNumSAgeChildren = int(facility_data["Max-Number-of-School-Age-Children"])
+            facility.LangOfService = facility_data["Language of Service"]
+            facility.operatorId = facility_data["Operator Id"]
+            facility.designatedFacility = facility_data["Designated Facility"]
+
+            self.view.update_facility_list()
 
     def delete_facility(self, index):
         """Delete a facility from the model based on index."""
