@@ -18,7 +18,7 @@ if repo.is_dirty() or repo.untracked_files:
     repo.git.add(A=True)  # Add all changes (modified and untracked files)
     
     # Commit the changes
-    commit_message = "Added Edit Page Buttons and functionality. Added to View and Controller to ensure MVC seperation of concerns"
+    commit_message = "Spent a long time (Too long) figuring out testing in Thonny. I beleive this is the last push."
     repo.index.commit(commit_message)
     
     # Print commit message

@@ -56,10 +56,10 @@ class FacilityModel:
 
                 print(f"According to Tanek Stuttgraham we've read {len(self.record_list)} records.")
                 print("Facility Records:")
-                # Print all records in the list
+                """ # Print all records in the list
                 for i, facility in enumerate(self.record_list, start=1):
                     print(facility)
-                    print(i)
+                    print(i)"""
 
         except IOError as e:
             print(f"IO Error, Make sure the file path is correct: {e}")
@@ -95,6 +95,8 @@ class FacilityModel:
                                 operatorId=lines['Operator-Id'],
                                 designatedFacility=lines['Designated-Facility']
                             )
+                            
+                            return facility
                             # Append record object to the list
                             self.record_list.append(facility)
                             self.record_i += 1 #increment for next load
@@ -107,16 +109,13 @@ class FacilityModel:
                             print("Program By Tanek Stuttgraham 041012512")
                             
                         break 
-    
-                        
 
             print(f"According to Tanek Stuttgraham we've read {len(self.record_list)} records.")
             print("Facility Records:")
-            # Print all records in the list
+            """# Print all records in the list
             for i, facility in enumerate(self.record_list, start=1):
                 print(facility)
-                print(i)
-
+                print(i)"""
         except IOError as e:
             print(f"IO Error, Make sure the file path is correct: {e}")
 
