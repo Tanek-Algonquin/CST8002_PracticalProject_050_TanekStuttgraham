@@ -15,7 +15,6 @@ class FacilityModel:
     def load_from_csv(self):
         """Load facility data from the CSV and populate the record list."""
         self.record_list = []
-        
         try:
             with open(file_path, mode='r') as file:
                 csvFile = csv.DictReader(file)
@@ -26,8 +25,7 @@ class FacilityModel:
                         # Print the message after every 10 records
                         if i % 10 == 0:
                             print("Program By Tanek Stuttgraham 041012512")
-                        try:
-                           
+                        try:  
                             # Create a facilityClass object from the current row
                             facility = facilityClass(
                                 region=lines['Region'],
@@ -48,18 +46,13 @@ class FacilityModel:
                             )
                             # Append the facility object to the list
                             self.record_list.append(facility)
-
                         except KeyError as e:
                             print(f"Key Error, Missing column or value: {e}")
                         except ValueError as e:
                             print(f"Data Type Error, Wrong Value Passed: {e}")
-
                 print(f"According to Tanek Stuttgraham we've read {len(self.record_list)} records.")
                 print("Facility Records:")
-                """ # Print all records in the list
-                for i, facility in enumerate(self.record_list, start=1):
-                    print(facility)
-                    print(i)"""
+              
 
         except IOError as e:
             print(f"IO Error, Make sure the file path is correct: {e}")
@@ -96,10 +89,11 @@ class FacilityModel:
                                 designatedFacility=lines['Designated-Facility']
                             )
                             
-                            return facility
+                            
                             # Append record object to the list
                             self.record_list.append(facility)
                             self.record_i += 1 #increment for next load
+                            return facility
 
                         except KeyError as e:
                             print(f"Key Error, Missing column or value: {e}")
@@ -111,7 +105,7 @@ class FacilityModel:
                         break 
 
             print(f"According to Tanek Stuttgraham we've read {len(self.record_list)} records.")
-            print("Facility Records:")
+            
             """# Print all records in the list
             for i, facility in enumerate(self.record_list, start=1):
                 print(facility)
@@ -141,8 +135,6 @@ class FacilityModel:
                                      facility.maxNumInfants, facility.maxNumPreChildren,
                                      facility.maxNumSAgeChildren, facility.LangOfService,
                                      facility.operatorId, facility.designatedFacility])
-
             print(f"Successfully saved data to {saving_file_path}")
-
         except IOError as e:
             print(f"IO Error, Did not save: {e}")

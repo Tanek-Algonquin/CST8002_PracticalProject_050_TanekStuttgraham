@@ -18,7 +18,7 @@ if repo.is_dirty() or repo.untracked_files:
     repo.git.add(A=True)  # Add all changes (modified and untracked files)
     
     # Commit the changes
-    commit_message = "Spent a long time (Too long) figuring out testing in Thonny. I beleive this is the last push."
+    commit_message = "Last Commit. Just made sure all functionality and unittests were working."
     repo.index.commit(commit_message)
     
     # Print commit message

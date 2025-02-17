@@ -14,23 +14,18 @@ class FacilityView:
         self.displayed_columns = [
             "Facility Name", "Facility Type", "Region", "District", "Max Number of Children"
         ]
-
         # Create a TreeView Widget
         self.facility_tree = ttk.Treeview(self.root, columns=self.displayed_columns, show="headings", height=10)
-
         # Pass column headers to row building loop
         for col in self.displayed_columns:
             self.facility_tree.heading(col, text=col)
             self.facility_tree.column(col, width=150, anchor="center")
-
         # Sticky nsew lets grid expand in any direction
         self.facility_tree.grid(row=0, column=0, columnspan=4, padx=9, pady=10, sticky="nsew")
-
         # Add scrollbar to the TreeView
         self.scrollbar = ttk.Scrollbar(self.root, orient="vertical", command=self.facility_tree.yview)
         self.facility_tree.configure(yscroll=self.scrollbar.set)
         self.scrollbar.grid(row=0, column=4, sticky="ns")
-
         # Create buttons for various actions
         self.create_buttons()
 
@@ -41,8 +36,6 @@ class FacilityView:
         self.load_button.grid(row=1, column=0, padx=5, pady=5)
 
         self.next_button = tk.Button(self.root,  text="Load One Record", command=self.load_one_record)
-        self.next_button.grid(row=1, column=1, padx=5, pady=5)
-
         self.next_button.grid(row=1, column=1, padx=5, pady=5)
 
         self.save_button = tk.Button(self.root, text="Save Facilities", command=self.save_facilities)
@@ -61,12 +54,13 @@ class FacilityView:
         self.show_more_button.grid(row=1, column=6, padx=5, pady=5)
         
     def load_one_record(self):
-        """Load the selected facility or the first one if none is selected."""
-        selected_row = self.facility_tree.selection()
+        """Load  the first one."""
+        
         index = 0  # Default to first facility if nothing is selected
-        if selected_row:
-            index = self.facility_tree.index(selected_row)  # Get index of selected row
+       
         self.controller.load_one_facility(index)
+        self.update_facility_list()
+        
     def show_more_details(self):
         """Open a window with full facility data shown."""
         selected_row = self.facility_tree.selection()

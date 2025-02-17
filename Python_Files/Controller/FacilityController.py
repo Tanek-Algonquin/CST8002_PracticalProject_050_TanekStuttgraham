@@ -2,6 +2,7 @@ from Model.facilityModel import FacilityModel
 from Model.facilityClass import facilityClass
 
 class FacilityController:
+    """Facility Controller manipulates the model based on event cues from the view class."""
     def __init__(self, model, view):
         """Initialize the controller with a model and a view."""
         self.model = model
@@ -17,7 +18,6 @@ class FacilityController:
         self.model.load_one_from_csv(index)
         self.view.update_facility_list()
     
-
     def save_facilities(self):
         """Save facilities from the model to CSV."""
         self.model.save_facilities()
