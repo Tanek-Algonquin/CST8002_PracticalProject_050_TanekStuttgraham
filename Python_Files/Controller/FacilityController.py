@@ -9,17 +9,18 @@ class FacilityController:
         self.view = view
 
     def load_facilities(self):
-        """Load facilities from CSV into the model."""
-        self.model.load_from_csv()
+        """Load facilities from DB into the model."""
+        self.model.load_all_changed_facilities()
         self.view.update_facility_list()
         
-    def load_one_facility(self, index):
+    def load_one_facility(self, facilityId):
         """Loads one facility from CSV into memory"""
-        self.model.load_one_from_csv(index)
+        self.model.load_changed_facility_by_id(facilityId)
         self.view.update_facility_list()
-    
+            
+            
     def save_facilities(self):
-        """Save facilities from the model to CSV."""
+        """Save facilities from the model to DB."""
         self.model.save_facilities()
 
     def add_facility(self, facility_data):
@@ -43,7 +44,7 @@ class FacilityController:
                 designatedFacility=facility_data["Designated Facility"]
             )
 
-            self.model.record_list.append(facility)
+            self.model.add_to_changed_facilities(facility)
             self.view.update_facility_list()
         
         except ValueError:
@@ -104,7 +105,8 @@ class FacilityController:
     def delete_facility(self, index):
         """Delete a facility from the model based on index."""
         if 0 <= index < len(self.model.record_list):
-            del self.model.record_list[index]
+            facility = self.model.record_list[index]
+            self.model.delete_facility
             self.view.update_facility_list()
         else:
             print("Invalid index for deletion.")

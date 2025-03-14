@@ -20,7 +20,7 @@ This file (facilityClass) was written by Tanek Stuttgraham Student No 041012512,
 -designatedFacility (str) : The ammount of designated facilities for this facility.
 """
     # Constructor for the records in the CSV
-    def __init__(self, facilityId, region, district, licenseNum, facilityName, facilityType, facilityAddress1,
+    def __init__(self, facilityId, region, district, licenceNum, facilityName, facilityType, facilityAddress1,
                  facilityAddress2, facilityAddress3, maxNumofChildren, maxNumInfants, maxNumPreChildren,
                  maxNumSAgeChildren, LangOfService, operatorId, designatedFacility):
         """
@@ -46,7 +46,7 @@ This file (facilityClass) was written by Tanek Stuttgraham Student No 041012512,
         self.facilityId = facilityId
         self._region = region
         self._district = district
-        self._licenseNum = licenseNum
+        self._licenceNum = licenceNum 
         self._facilityName = facilityName
         self._facilityType = facilityType
         self._facilityAddress1 = facilityAddress1

@@ -56,9 +56,9 @@ class FacilityView:
     def load_one_record(self):
         """Load  the first one."""
         
-        index = 0  # Default to first facility if nothing is selected
+        facilityId = 0  # Default to first facility if nothing is selected
        
-        self.controller.load_one_facility(index)
+        self.controller.load_one_facility(facilityId)
         self.update_facility_list()
         
     def show_more_details(self):

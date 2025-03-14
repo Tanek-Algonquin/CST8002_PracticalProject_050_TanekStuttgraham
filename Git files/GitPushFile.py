@@ -18,7 +18,7 @@ if repo.is_dirty() or repo.untracked_files:
     repo.git.add(A=True)  # Add all changes (modified and untracked files)
     
     # Commit the changes
-    commit_message = "Refractored facilityModel to include CRUD functions."
+    commit_message = "Refractored facilityController to Use Models CRUD functions. Loading to application works now."
     repo.index.commit(commit_message)
     
     # Print commit message
