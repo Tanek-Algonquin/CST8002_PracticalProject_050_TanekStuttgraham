@@ -18,7 +18,7 @@ if repo.is_dirty() or repo.untracked_files:
     repo.git.add(A=True)  # Add all changes (modified and untracked files)
     
     # Commit the changes
-    commit_message = "First Commit of Practical Project Part 3. Added the SQL Script I used to create the table I will use."
+    commit_message = "Changed the SQL Script and the table's I will use."
     repo.index.commit(commit_message)
     
     # Print commit message
