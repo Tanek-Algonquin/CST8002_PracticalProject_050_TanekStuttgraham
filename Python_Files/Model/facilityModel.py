@@ -1,140 +1,104 @@
-import csv
+import  mysql.connector
 from Model.facilityClass import facilityClass
+
 """This file (FacilityModel) was written by Tanek Stuttgraham Student No 041012512, Course Code: CST8002_050, Prof. Todd Keuleman"""
-
-# File path to the CSV
-file_path = r"C:\AAFINAL-SEMESTER\Programming Language Research Project\Practical_Project\Licensed_Early_Learning_and_Childcare_Facilities.csv"
-saving_file_path = "C:/AAFINAL-SEMESTER/Programming Language Research Project/Practical_Project/Saved_Facility_CSV.csv"
-
 class FacilityModel:
     def __init__(self):
         """Initialize FacilityModel with empty record list."""
         self.record_list = []  # List to store facility objects
-        self.record_i = 0 # Variable to track record loaded
-
-    def load_from_csv(self):
-        """Load facility data from the CSV and populate the record list."""
-        self.record_list = []
-        try:
-            with open(file_path, mode='r') as file:
-                csvFile = csv.DictReader(file)
-                # Loop through each row, limited to 100 records
-                for i, lines in enumerate(csvFile, start=1):
-                    if i <= 10:  # Read only 100 records
-                        print(f"Records Read According To Tanek Stuttgraham 041012512 --> {i}")
-                        # Print the message after every 10 records
-                        if i % 10 == 0:
-                            print("Program By Tanek Stuttgraham 041012512")
-                        try:  
-                            # Create a facilityClass object from the current row
-                            facility = facilityClass(
-                                region=lines['Region'],
-                                district=lines['District'],
-                                licenseNum=lines['License-Number'],
-                                facilityName=lines['Facility-Name'],
-                                facilityType=lines['Facility-Type'],
-                                facilityAddress1=lines['Facility-Address-1'],
-                                facilityAddress2=lines['Facility-Address-2'],
-                                facilityAddress3=lines['Facility-Address-3'],
-                                maxNumofChildren=int(lines['Max-Number-of-Children']),
-                                maxNumInfants=int(lines['Max-Number-of-Infants']),
-                                maxNumPreChildren=int(lines['Max-Number-of-Preschool-Aged-Children']),
-                                maxNumSAgeChildren=int(lines['Max-Number-of-School-Age-Children']),
-                                LangOfService=lines['Language-of-Service'],
-                                operatorId=lines['Operator-Id'],
-                                designatedFacility=lines['Designated-Facility']
-                            )
-                            # Append the facility object to the list
-                            self.record_list.append(facility)
-                        except KeyError as e:
-                            print(f"Key Error, Missing column or value: {e}")
-                        except ValueError as e:
-                            print(f"Data Type Error, Wrong Value Passed: {e}")
-                print(f"According to Tanek Stuttgraham we've read {len(self.record_list)} records.")
-                print("Facility Records:")
-              
-
-        except IOError as e:
-            print(f"IO Error, Make sure the file path is correct: {e}")
-
+        self.conn = mysql.connector.connect ( #MySQL Connection.
+        host="localhost",
+        user="cst8277",
+        password="8277",
+        database="pythondb"
+        )
+        self.cursor = self.conn.cursor(dictionary=True)
         
-    def load_one_from_csv(self, index):
-        """Load only one facility from the CSV by index."""
+        
+    def load_original_to_changed(self):
+        """Method loads original facility data to changed facility table to reset the chenged table."""
         try:
-            with open(file_path, mode='r') as file:
-                # Each row becomes a dictionary, csv.DictReader pairs keys and data
-                csvFile = csv.DictReader(file)
-                for i, lines in enumerate(csvFile, start=0):
-                    if i == self.record_i:  # Read only 1 record
-                        print(f"Records Read According To Tanek Stuttgraham 041012512 --> {i}")
-                        # Print the message after every 10 records
-                        if i % 10 == 0:
-                            print("Program By Tanek Stuttgraham 041012512")
-                        try:   # Create a facilityClass object and pass each row value into the correct variable.
-                            facility = facilityClass(
-                                region=lines['Region'],
-                                district=lines['District'],
-                                licenseNum=lines['License-Number'],
-                                facilityName=lines['Facility-Name'],
-                                facilityType=lines['Facility-Type'],
-                                facilityAddress1=lines['Facility-Address-1'],
-                                facilityAddress2=lines['Facility-Address-2'],
-                                facilityAddress3=lines['Facility-Address-3'],
-                                maxNumofChildren=int(lines['Max-Number-of-Children']),
-                                maxNumInfants=int(lines['Max-Number-of-Infants']),
-                                maxNumPreChildren=int(lines['Max-Number-of-Preschool-Aged-Children']),
-                                maxNumSAgeChildren=int(lines['Max-Number-of-School-Age-Children']),
-                                LangOfService=lines['Language-of-Service'],
-                                operatorId=lines['Operator-Id'],
-                                designatedFacility=lines['Designated-Facility']
-                            )
-                            
-                            
-                            # Append record object to the list
-                            self.record_list.append(facility)
-                            self.record_i += 1 #increment for next load
-                            return facility
-
-                        except KeyError as e:
-                            print(f"Key Error, Missing column or value: {e}")
-                        except ValueError as e:
-                            print(f"Data Type Error, Wrong Value Passed: {e}")
-                        if i % 10 == 0:
-                            print("Program By Tanek Stuttgraham 041012512")
-                            
-                        break 
-
-            print(f"According to Tanek Stuttgraham we've read {len(self.record_list)} records.")
+            self.cursor.execute("DELETE * FROM changed_childcare_facilities")#Clear table before loading
+            self.cursor.execute("""INSERT INTO changed_childcare_facilities SELECT * FROM original_childcare_facilities""")
             
-            """# Print all records in the list
-            for i, facility in enumerate(self.record_list, start=1):
-                print(facility)
-                print(i)"""
-        except IOError as e:
-            print(f"IO Error, Make sure the file path is correct: {e}")
-
-    def save_facilities(self):
-        """Save the facilities data to a CSV file."""
+            self.conn.commit()
+            print("Loaded original table to changed table.")
+            
+            except mysql.connector.Error as e:
+                print(f"Database Error: {e}")
+    
+    def load_all_changed_facilities(self):
+        """Method loads All records from changed facility table."""
         try:
-            with open(saving_file_path, mode='w', newline='') as file:
-                writer = csv.writer(file)
-                # Writing Headers
-                writer.writerow(['Region', 'District', 'License-Number', 'Facility-Name',
-                                 'Facility-Type', 'Facility-Address-1', 'Facility-Address-2',
-                                 'Facility-Address-3', 'Max-Number-of-Children',
-                                 'Max-Number-of-Infants', 'Max-Number-of-Preschool-Aged-Children',
-                                 'Max-Number-of-School-Age-Children', 'Language-of-Service',
-                                 'Operator-Id', 'Designated-Facility'])
+            self.cursor.execute("SELECT * FROM changed_childcare_facilities")
+            self.record_list = self.cursor.fetchall() #Pass records to list.
+            return  record_list
+        except mysql.connector.Error as e:
+            print(f"Database Error: {e}")
+            return []
+        
+    def load_changed_facility_by_id(self, facilityId):
+        """Loads A specified changed facility record by its Id"""
+            try:
+                self.cursor.execute("SELECT FROM changed_childcare_facilities WHERE id = %s", (facilityId))
+                return self.cursor.fetchone()
+            except mysql.connector.Error as e:
+                print(f"DataBaseError: {e}")
+                return None #Return Nothing If Error occurs
+            
+    def add_to_changed_facilities(self, facility):
+        """Adds a facility record to Changed childcare facility table."""
+         #Prepared Statement
+        prepared_sql = """
+        INSERT INTO original_childcare_facilities (region, district, licenceNum, facilityName, facilityType,
+            facilityAddress1, facilityAddress2, facilityAddress3,
+            maxNumofChildren, maxNumInfants, maxNumPreChildren,
+            maxNumSAgeChildren, LangOfService, operatorId, designatedFacility)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) """
 
-                # Write Facility Object Data
-                for facility in self.record_list:
-                    writer.writerow([facility.region, facility.district, facility.licenseNum,
-                                     facility.facilityName, facility.facilityType,
-                                     facility.facilityAddress1, facility.facilityAddress2,
-                                     facility.facilityAddress3, facility.maxNumofChildren,
-                                     facility.maxNumInfants, facility.maxNumPreChildren,
-                                     facility.maxNumSAgeChildren, facility.LangOfService,
-                                     facility.operatorId, facility.designatedFacility])
-            print(f"Successfully saved data to {saving_file_path}")
-        except IOError as e:
-            print(f"IO Error, Did not save: {e}")
+        # Values to insert into the database
+        values = (
+            region, district, licenceNum, facilityName, facilityType,
+            facilityAddress1, facilityAddress2, facilityAddress3,
+            maxNumofChildren, maxNumInfants, maxNumPreChildren,
+            maxNumSAgeChildren, LangOfService, operatorId, designatedFacility)
+        
+        self.cursor.execute(prepared_sql, values)
+        self.conn.commit()
+        print("Facility Added to Changed Facilty Tabke Successfully")
+        
+    def update_in_changed_facilities(self, facilityid, updatedValues):
+        """Updates an existing Facility in Changed Facilites table."""
+        if not updatedValues:
+            print("No Updated Values Provided.")
+            return
+        try:
+            prepared_sql = f"UPDATE changed_childcare_facilities SET 	{', '.join(f'{k} = %s' for k in updated_values)} WHERE id = %s"
+            self.cursor.execute(prepared_sql, (*updatedValues.values(), facilityid))
+            self.conn.commit()
+            print("Updated Succesfully")
+        except mysql.connector.Error as e:
+            print("Sql Error : {e} ")
+                    
+
+    def delete_facility(self, facilityId):
+            """Delete a facility from changed_childcare_facilities."""
+            try:
+                self.cursor.execute("DELETE FROM changed_childcare_facilities WHERE id = %s", (facilityId,))
+                self.conn.commit()
+                print("Facility deleted successfully.")
+            except mysql.connector.Error as e:
+                print(f"Database Error: {e}")
+     
+            
+    def restore_original_facilities(self):
+            """Rewrite changed_childcare_facilities with original_childcare_facilities data."""
+            self.load_original_facilities()
+            print("Restored changed_childcare_facilities to original state.")
+        
+    
+    def close_connection(self):
+    """Close the database connection."""
+    self.cursor.close()
+    self.conn.close()
+    

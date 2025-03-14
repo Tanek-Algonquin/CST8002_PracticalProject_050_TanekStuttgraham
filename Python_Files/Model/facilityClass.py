@@ -20,12 +20,13 @@ This file (facilityClass) was written by Tanek Stuttgraham Student No 041012512,
 -designatedFacility (str) : The ammount of designated facilities for this facility.
 """
     # Constructor for the records in the CSV
-    def __init__(self, region, district, licenseNum, facilityName, facilityType, facilityAddress1,
+    def __init__(self, facilityId, region, district, licenseNum, facilityName, facilityType, facilityAddress1,
                  facilityAddress2, facilityAddress3, maxNumofChildren, maxNumInfants, maxNumPreChildren,
                  maxNumSAgeChildren, LangOfService, operatorId, designatedFacility):
         """
     Initialized facility object with parametres passed from csv record.
     Parameters:
+-facilityId (int) : Id for facility in DB
 -region (str) : The region where this facility is located.
 -district (str) : The district where this facility is located.
 -liscenceNum (str): The liscence number of this facility.
@@ -42,6 +43,7 @@ This file (facilityClass) was written by Tanek Stuttgraham Student No 041012512,
 -operatorId (str) : The operator Id of this facility
 -designatedFacility (str) : The ammount of designated facilities for this facility.
 """
+        self.facilityId = facilityId
         self._region = region
         self._district = district
         self._licenseNum = licenseNum
@@ -65,6 +67,7 @@ A custom string representation of the facilities data.
 """
         return (
             f"Tanek Stuttgraham approves of this facility ;\n"
+            f"facilityId : {self.facilityId} , \n"
             f"Region : {self._region},  \n"
             f"District : {self._district}, \n"
             f"License number : {self._licenseNum}, \n"
@@ -89,7 +92,15 @@ A custom string representation of the facilities data.
     @region.setter
     def region(self, value):
         self._region = value
-
+    
+    """Getter For Facility Id"""   
+    @property
+    def facilityId(self):
+        return self._facilityId
+    """Setter For Facility Id"""
+    @facilityId.setter
+    def facilityId(self, value):
+        self._facilityId = value
     """Getter for district"""
     @property
     def district(self):
