@@ -12,7 +12,7 @@ class FacilityView:
         self.current_index = None
         # Defining columns makes building view easier
         self.displayed_columns = [
-            "Facility Name", "Facility Type", "Region", "District", "Max Number of Children"
+           "Facility Name", "Facility Id", "Facility Type", "Region", "District", "Max Number of Children"
         ]
         # Create a TreeView Widget
         self.facility_tree = ttk.Treeview(self.root, columns=self.displayed_columns, show="headings", height=10)
@@ -32,26 +32,29 @@ class FacilityView:
     def create_buttons(self):
         """Create buttons to interact with the controller."""
         
-        self.load_button = tk.Button(self.root, text="Load Facilities", command=self.load_facilities)
-        self.load_button.grid(row=1, column=0, padx=5, pady=5)
+        self.load_button = tk.Button(self.root, text="Load Updated Facilities", command=self.load_facilities)
+        self.load_button.grid(row=1, column=1, padx=5, pady=5)
 
-        self.next_button = tk.Button(self.root,  text="Load One Record", command=self.load_one_record)
-        self.next_button.grid(row=1, column=1, padx=5, pady=5)
-
+        self.next_button = tk.Button(self.root,  text="Load Original Facilities", command=self.load_original_facilities)
+        self.next_button.grid(row=1, column=0, padx=5, pady=5)
+        
+        self.next_button = tk.Button(self.root,  text="Reset Changed Facilities List", command=self.load_original_to_changed)
+        self.next_button.grid(row=1, column=2, padx=5, pady=5)
+       
         self.save_button = tk.Button(self.root, text="Save Facilities", command=self.save_facilities)
-        self.save_button.grid(row=1, column=2, padx=5, pady=5)
+        self.save_button.grid(row=1, column=3, padx=5, pady=5)
 
         self.add_button = tk.Button(self.root, text="Add Facility", command=self.open_add_facility_window)
-        self.add_button.grid(row=1, column=3, padx=5, pady=5)
+        self.add_button.grid(row=1, column=4, padx=5, pady=5)
         
         self.edit_button = tk.Button(self.root, text="Edit Facility", command=self.open_edit_facility_window)
-        self.edit_button.grid(row=1, column=4, padx=5, pady=5)
+        self.edit_button.grid(row=1, column=5, padx=5, pady=5)
 
         self.delete_button = tk.Button(self.root, text="Delete Facility", command=self.delete_facility)
-        self.delete_button.grid(row=1, column=5, padx=5, pady=5)
+        self.delete_button.grid(row=1, column=6, padx=5, pady=5)
 
         self.show_more_button = tk.Button(self.root, text="Show More Details", command=self.show_more_details)
-        self.show_more_button.grid(row=1, column=6, padx=5, pady=5)
+        self.show_more_button.grid(row=1, column=7, padx=5, pady=5)
         
     def load_one_record(self):
         """Load  the first one."""
@@ -77,9 +80,10 @@ class FacilityView:
         frame.pack(padx=50, pady=40)
         # Label Keys and Data
         details_list = [
+            ("Facility Id", facility.facilityId),
             ("Region", facility.region),
             ("District", facility.district),
-            ("License Number", facility.licenseNum),
+            ("License Number", facility.licenceNum),
             ("Facility Name", facility.facilityName),
             ("Facility Type", facility.facilityType),
             ("Primary Address", facility.facilityAddress1),
@@ -123,7 +127,7 @@ class FacilityView:
         details_list = [
             ("Region", facility.region),
             ("District", facility.district),
-            ("License Number", facility.licenseNum),
+            ("License Number", facility.licenceNum),
             ("Facility Name", facility.facilityName),
             ("Facility Type", facility.facilityType),
             ("Primary Address", facility.facilityAddress1),
@@ -191,11 +195,22 @@ class FacilityView:
                 selected_index = 0  # Default to first facility
 
             self.show_more_details_by_index(selected_index)
+            
+    def load_original_to_changed(self):
+        """Loads original list into changed list"""
+        self.controller.load_original_to_changed()
+        self.controller.load_facilities()
+        self.update_facility_list()
 
 
     def load_facilities(self):
         """Call the controller's method to load facilities."""
         self.controller.load_facilities()
+        self.update_facility_list()
+        
+    def load_original_facilities(self):
+        """Call the controller's method to load facilities."""
+        self.controller.load_original_facilities()
         self.update_facility_list()
 
     def save_facilities(self):
@@ -210,7 +225,7 @@ class FacilityView:
         # Dictionary to store entry fields
         self.entry_fields = {}
         
-        headers = ["Region", "District", "License Number", "Facility Name", "Facility Type",
+        headers = ["Region", "District", "Licence Number", "Facility Name", "Facility Type",
            "Facility Address 1", "Facility Address 2", "Facility Address 3",
            "Max Number of Children", "Max Number of Infants",
            "Max-Number-of-Preschool-Aged-Children", "Max-Number-of-School-Age-Children",
@@ -263,12 +278,27 @@ class FacilityView:
             messagebox.showwarning("No Selection", "Please select a facility to delete.")
             return
 
-        # Get selected item details
-        selected_index = self.facility_tree.index(selected_item)
-        self.controller.delete_facility(selected_index)
+        # Get all column values for debugging
+        facility_values = self.facility_tree.item(selected_item, "values")
+        print(f"Selected row values: {facility_values}")  # Debugging
 
-        # Refresh list
+        # Identify the correct index for facilityId
+        facilityId = facility_values[1]  # Change this if needed
+
+        try:
+            facilityId = int(facilityId)  # Ensure it's an integer
+        except ValueError:
+            print(f"Error: Facility ID is not a valid integer. Got: {facilityId}")
+            return
+
+        print(f"Attempting to delete Facility ID: {facilityId}")  # Debugging
+
+        # Call the controller to delete the facility
+        self.controller.delete_facility(facilityId)
+
+        # Refresh the list
         self.update_facility_list()
+
         
     def open_edit_facility_window(self):
         """Opens a window that allows editing facilities"""
@@ -295,14 +325,10 @@ class FacilityView:
         for i, header in enumerate(headers):
             label = tk.Label(edit_window, text=header)
             label.grid(row=i, column=0, padx=5, pady=2, sticky="w")
-          
             entry = tk.Entry(edit_window, width=40)
             entry.insert(0, str(facility_data[header]))
             entry.grid(row=i, column=1, padx=5, pady=2)
-            
-            self.edit_fields[header] = entry
-            
-            
+            self.edit_fields[header] = entry     
         # Submit button
         submit_button = tk.Button(edit_window, text="Submit", command=lambda: self.save_edited_facility(edit_window, selected_i))
         submit_button.grid(row=len(headers), column=0, columnspan=2, pady=10)
@@ -326,5 +352,5 @@ class FacilityView:
         # Insert new facility data
         for facility in self.controller.model.record_list:
             self.facility_tree.insert("", "end", values=[
-                facility.facilityName, facility.facilityType, facility.region, facility.district, facility.maxNumofChildren
+                facility.facilityName, facility.facilityId, facility.facilityType, facility.region, facility.district, facility.maxNumofChildren
             ])

@@ -13,6 +13,15 @@ class FacilityController:
         self.model.load_all_changed_facilities()
         self.view.update_facility_list()
         
+    def load_original_to_changed(self):
+        self.model.load_original_to_changed()
+        self.view.update_facility_list()
+    
+    def load_original_facilities(self):
+        """Load facilities from DB into the model."""
+        self.model.load_original_facilities()
+        self.view.update_facility_list()
+        
     def load_one_facility(self, facilityId):
         """Loads one facility from CSV into memory"""
         self.model.load_changed_facility_by_id(facilityId)
@@ -29,7 +38,7 @@ class FacilityController:
             facility = facilityClass(
                 region=facility_data["Region"],
                 district=facility_data["District"],
-                licenseNum=facility_data["License Number"],
+                licenceNum=facility_data["Licence Number"],
                 facilityName=facility_data["Facility Name"],
                 facilityType=facility_data["Facility Type"],
                 facilityAddress1=facility_data["Facility Address 1"],
@@ -43,7 +52,7 @@ class FacilityController:
                 operatorId=facility_data["Operator Id"],
                 designatedFacility=facility_data["Designated Facility"]
             )
-
+            
             self.model.add_to_changed_facilities(facility)
             self.view.update_facility_list()
         
@@ -63,7 +72,7 @@ class FacilityController:
             return {
                 "Region": facility.region,
                 "District": facility.district,
-                "License Number": facility.licenseNum,
+                "Licence Number": facility.licenceNum,
                 "Facility Name": facility.facilityName,
                 "Facility Type": facility.facilityType,
                 "Facility Address 1": facility.facilityAddress1,
@@ -86,7 +95,7 @@ class FacilityController:
 
             facility.region = facility_data["Region"]
             facility.district = facility_data["District"]
-            facility.licenseNum = facility_data["License Number"]
+            facility.licenceNum = facility_data["Licence Number"]
             facility.facilityName = facility_data["Facility Name"]
             facility.facilityType = facility_data["Facility Type"]
             facility.facilityAddress1 = facility_data["Facility Address 1"]
@@ -102,11 +111,8 @@ class FacilityController:
 
             self.view.update_facility_list()
 
-    def delete_facility(self, index):
-        """Delete a facility from the model based on index."""
-        if 0 <= index < len(self.model.record_list):
-            facility = self.model.record_list[index]
-            self.model.delete_facility
-            self.view.update_facility_list()
-        else:
-            print("Invalid index for deletion.")
+    def delete_facility(self, facilityId):
+        """Delete a facility from the model based on Facility Id."""
+        self.model.delete_facility(facilityId)
+        self.view.update_facility_list()
+        

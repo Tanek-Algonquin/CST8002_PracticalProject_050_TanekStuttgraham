@@ -1,7 +1,7 @@
 class facilityClass:
     """
 This file (facilityClass) was written by Tanek Stuttgraham Student No 041012512, Course Code: CST8002_050, Prof. Todd Keuleman
- This class represents a liscenced childcare facility found in the csv dataset provided.
+ This class represents a liscenced childcare facility found in the csv dataset provided and in the database.
   Attributes:
  -region (str) : The region where this facility is located.
  -district (str) : The district where this facility is located.
@@ -19,12 +19,12 @@ This file (facilityClass) was written by Tanek Stuttgraham Student No 041012512,
 -operatorId (str) : The operator Id of this facility
 -designatedFacility (str) : The ammount of designated facilities for this facility.
 """
-    # Constructor for the records in the CSV
-    def __init__(self, facilityId, region, district, licenceNum, facilityName, facilityType, facilityAddress1,
+    # Constructor for the records in the DB
+    def __init__(self,  region, district, licenceNum, facilityName, facilityType, facilityAddress1,
                  facilityAddress2, facilityAddress3, maxNumofChildren, maxNumInfants, maxNumPreChildren,
-                 maxNumSAgeChildren, LangOfService, operatorId, designatedFacility):
+                 maxNumSAgeChildren, LangOfService, operatorId, designatedFacility,facilityId=None ):
         """
-    Initialized facility object with parametres passed from csv record.
+    Initialized facility object with parametres passed from csv record or the DB.
     Parameters:
 -facilityId (int) : Id for facility in DB
 -region (str) : The region where this facility is located.
@@ -70,7 +70,7 @@ A custom string representation of the facilities data.
             f"facilityId : {self.facilityId} , \n"
             f"Region : {self._region},  \n"
             f"District : {self._district}, \n"
-            f"License number : {self._licenseNum}, \n"
+            f"licence number : {self._licenceNum}, \n"
             f"Facility name: {self._facilityName}, \n"
             f"Facility type : {self._facilityType}, \n"
             f"First facilityAddress : {self._facilityAddress1}, \n"
@@ -110,14 +110,14 @@ A custom string representation of the facilities data.
     def district(self, value):
         self._district = value
 
-    """Getter for licenseNum"""
+    """Getter for licenceNum"""
     @property
-    def licenseNum(self):
-        return self._licenseNum
-    """Setter for licenseNum"""
-    @licenseNum.setter
-    def licenseNum(self, value):
-        self._licenseNum = value
+    def licenceNum(self):
+        return self._licenceNum
+    """Setter for licenceNum"""
+    @licenceNum.setter
+    def licenceNum(self, value):
+        self._licenceNum = value
 
     """Setter for facilityName"""
     @property

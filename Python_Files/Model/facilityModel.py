@@ -27,12 +27,50 @@ class FacilityModel:
         except mysql.connector.Error as e:
             print(f"Database Error: {e}")
     
+    def load_original_facilities(self):
+        """Method loads All records from original_childcare_facilities table and converts them to facilityClass instances."""
+        try:
+            self.cursor.execute("SELECT * FROM original_childcare_facilities")
+            rows = self.cursor.fetchall()  # Fetch all rows as dictionaries
+            
+            # Convert each dictionary into a facilityClass instance
+            self.record_list = []
+            for row in rows:
+          
+                facility = facilityClass(
+                    
+                    facilityId=row["id"],
+                    region=row["region"],
+                    district=row["district"],
+                    licenceNum=row["licenceNum"],
+                    facilityName=row["facilityName"],
+                    facilityType=row["facilityType"],
+                    facilityAddress1=row["facilityAddress1"],
+                    facilityAddress2=row["facilityAddress2"],
+                    facilityAddress3=row["facilityAddress3"],
+                    maxNumofChildren=row["maxNumofChildren"],
+                    maxNumInfants=row["maxNumInfants"],
+                    maxNumPreChildren=row["maxNumPreChildren"],
+                    maxNumSAgeChildren=row["maxNumSAgeChildren"],
+                    LangOfService=row["LangOfService"],
+                    operatorId=row["operatorId"],
+                    designatedFacility=row["designatedFacility"],
+                    
+                )
+        
+                self.record_list.append(facility)
+            
+            return self.record_list  # Make sure this return is inside the try block
+
+        except mysql.connector.Error as e:
+            print(f"Database Error: {e}")
+            return []  # Return an empty list if there's a database error
+        
     def load_all_changed_facilities(self):
         """Method loads All records from changed facility table and converts them to facilityClass instances."""
         try:
             self.cursor.execute("SELECT * FROM changed_childcare_facilities")
             rows = self.cursor.fetchall()  # Fetch all rows as dictionaries
-            
             # Convert each dictionary into a facilityClass instance
             self.record_list = []
             for row in rows:
@@ -52,8 +90,10 @@ class FacilityModel:
                     maxNumSAgeChildren=row["maxNumSAgeChildren"],
                     LangOfService=row["LangOfService"],
                     operatorId=row["operatorId"],
-                    designatedFacility=row["designatedFacility"]
+                    designatedFacility=row["designatedFacility"],
+                    
                 )
+        
                 self.record_list.append(facility)
             
             return self.record_list  # Make sure this return is inside the try block
@@ -107,9 +147,66 @@ class FacilityModel:
         
         self.cursor.execute(prepared_sql, values)
         self.conn.commit()
-        print("Facility Added to Changed Facilty Tabke Successfully")
         
+        self.cursor.execute(" SELECT LAST_INSERT_ID()")
+        fetchedId = self.cursor.fetchone()
         
+        facility.facilityId = fetchedId['LAST_INSERT_ID()']
+        
+        self.record_list.append(facility)
+        print("Facility Added to Changed Facilty Table Successfully")
+        
+
+    def save_facilities(self):
+        """Deletes content in changed facility table and saves new record list as records."""
+        try:
+            # Delete all existing records
+            delete_sql = "DELETE FROM changed_childcare_facilities"
+            self.cursor.execute(delete_sql)
+            
+            # SQL statement for inserting new records
+            insert_sql = """
+            INSERT INTO changed_childcare_facilities (
+                region, district, licenceNum, facilityName, facilityType,
+                facilityAddress1, facilityAddress2, facilityAddress3,
+                maxNumofChildren, maxNumInfants, maxNumPreChildren,
+                maxNumSAgeChildren, LangOfService, operatorId, designatedFacility
+            ) VALUES (
+                %(region)s, %(district)s, %(licenceNum)s, %(facilityName)s, %(facilityType)s,
+                %(facilityAddress1)s, %(facilityAddress2)s, %(facilityAddress3)s, 
+                %(maxNumofChildren)s, %(maxNumInfants)s, %(maxNumPreChildren)s,
+                %(maxNumSAgeChildren)s, %(LangOfService)s, %(operatorId)s, %(designatedFacility)s
+            )"""
+            
+            # Insert each record from self.record_list
+            for record in self.record_list:
+                values = {
+                    "region": record.region,
+                    "district": record.district,
+                    "licenceNum": record.licenceNum,
+                    "facilityName": record.facilityName,
+                    "facilityType": record.facilityType,
+                    "facilityAddress1": record.facilityAddress1,
+                    "facilityAddress2": record.facilityAddress2,
+                    "facilityAddress3": record.facilityAddress3,
+                    "maxNumofChildren": record.maxNumofChildren,
+                    "maxNumInfants": record.maxNumInfants,
+                    "maxNumPreChildren": record.maxNumPreChildren,
+                    "maxNumSAgeChildren": record.maxNumSAgeChildren,
+                    "LangOfService": record.LangOfService,
+                    "operatorId": record.operatorId,
+                    "designatedFacility": record.designatedFacility
+                }
+                self.cursor.execute(insert_sql, values)
+            
+            # Commit transaction after inserting all records
+            self.conn.commit()
+            print("All Facilities Saved Successfully")
+
+        except mysql.connector.Error as e:
+            print(f"Database error: {e}")
+            self.conn.rollback()  # Rollback changes in case of an error
+                
     def update_in_changed_facilities(self, facilityId, updatedValues):
         """Updates an existing Facility in Changed Facilites table."""
         if not updatedValues:
@@ -122,15 +219,28 @@ class FacilityModel:
             print("Updated Succesfully")
         except mysql.connector.Error as e:
             print("Sql Error : {e} ")
-                    
+            
+                        
 
     def delete_facility(self, facilityId):
             """Delete a facility from changed_childcare_facilities."""
             try:
-                prepared_sql = "DELETE FROM changed_childcare_facilities WHERE id = %s"
+                prepared_sql = "DELETE FROM changed_childcare_facilities WHERE id = %(facilityId)s"
                 self.cursor.execute(prepared_sql, {"facilityId": facilityId})
                 self.conn.commit()
-                print("Facility deleted successfully.")
+                
+                checking_sql = "SELECT * FROM changed_childcare_facilities WHERE id = %(facilityId)s"
+                self.cursor.execute(checking_sql , {"facilityId": facilityId})
+                delete_result = self.cursor.fetchone()
+                
+                if delete_result is None:
+                    print("Facility deleted successfully.")
+                    
+                    # Remove from record_list
+                    self.record_list = [facility for facility in self.record_list if facility.facilityId != facilityId]
+                    print(f"Facility with ID {facilityId} removed from record_list.")
+                else:
+                    print("Facility deletion failed")
             except mysql.connector.Error as e:
                 print(f"Database Error: {e}")
      
