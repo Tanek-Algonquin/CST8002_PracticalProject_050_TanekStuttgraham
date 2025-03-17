@@ -37,31 +37,32 @@ class FacilityView:
 
         self.next_button = tk.Button(self.root,  text="Load Original Facilities", command=self.load_original_facilities)
         self.next_button.grid(row=1, column=0, padx=5, pady=5)
-        
-        self.next_button = tk.Button(self.root,  text="Reset Changed Facilities List", command=self.load_original_to_changed)
+        """
+        self.next_button = tk.Button(self.root,  text="Load One From Original Facilities", command=self.load_one_original_facility)
         self.next_button.grid(row=1, column=2, padx=5, pady=5)
+        """
+        self.next_button = tk.Button(self.root,  text="Reset Changed Facilities List", command=self.load_original_to_changed)
+        self.next_button.grid(row=1, column=3, padx=5, pady=5)
        
         self.save_button = tk.Button(self.root, text="Save Facilities", command=self.save_facilities)
-        self.save_button.grid(row=1, column=3, padx=5, pady=5)
+        self.save_button.grid(row=1, column=4, padx=5, pady=5)
 
         self.add_button = tk.Button(self.root, text="Add Facility", command=self.open_add_facility_window)
-        self.add_button.grid(row=1, column=4, padx=5, pady=5)
+        self.add_button.grid(row=1, column=5, padx=5, pady=5)
         
         self.edit_button = tk.Button(self.root, text="Edit Facility", command=self.open_edit_facility_window)
-        self.edit_button.grid(row=1, column=5, padx=5, pady=5)
+        self.edit_button.grid(row=1, column=6, padx=5, pady=5)
 
         self.delete_button = tk.Button(self.root, text="Delete Facility", command=self.delete_facility)
-        self.delete_button.grid(row=1, column=6, padx=5, pady=5)
+        self.delete_button.grid(row=1, column=7, padx=5, pady=5)
 
         self.show_more_button = tk.Button(self.root, text="Show More Details", command=self.show_more_details)
-        self.show_more_button.grid(row=1, column=7, padx=5, pady=5)
+        self.show_more_button.grid(row=1, column=8, padx=5, pady=5)
         
-    def load_one_record(self):
+    def load_one_original_facility(self):
         """Load  the first one."""
-        
-        facilityId = 0  # Default to first facility if nothing is selected
        
-        self.controller.load_one_facility(facilityId)
+        self.controller.get_first_available_facility()
         self.update_facility_list()
         
     def show_more_details(self):
@@ -315,7 +316,7 @@ class FacilityView:
         
         self.edit_fields = {}
         
-        headers = ["Region", "District", "License Number", "Facility Name", "Facility Type",
+        headers = ["Region", "District", "Licence Number", "Facility Name", "Facility Type",
            "Facility Address 1", "Facility Address 2", "Facility Address 3",
            "Max Number of Children", "Max Number of Infants",
            "Max-Number-of-Preschool-Aged-Children", "Max-Number-of-School-Age-Children",

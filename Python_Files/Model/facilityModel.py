@@ -22,7 +22,7 @@ class FacilityModel:
             self.cursor.execute("""INSERT INTO changed_childcare_facilities SELECT * FROM original_childcare_facilities""")
             
             self.conn.commit()
-            print("Loaded original table to changed table.")
+            print("Loaded original table to changed table. Tanek Stuttgraham 041012512")
             
         except mysql.connector.Error as e:
             print(f"Database Error: {e}")
@@ -57,7 +57,7 @@ class FacilityModel:
                     designatedFacility=row["designatedFacility"],
                     
                 )
-        
+                print("Loaded Original Table. Tanek Stuttgraham 041012512")
                 self.record_list.append(facility)
             
             return self.record_list  # Make sure this return is inside the try block
@@ -93,7 +93,7 @@ class FacilityModel:
                     designatedFacility=row["designatedFacility"],
                     
                 )
-        
+                print("Loaded Changed Tabel. Tanek Stuttgraham 041012512")
                 self.record_list.append(facility)
             
             return self.record_list  # Make sure this return is inside the try block
@@ -112,6 +112,43 @@ class FacilityModel:
         except mysql.connector.Error as e:
             print(f"DataBaseError: {e}")
             return None #Return Nothing If Error occurs
+        
+    def get_first_available_facility(self):
+        """Fetches the first available facility record from the original_childcare_facilities table and creates a facilityClass object."""
+        
+        try:
+            self.cursor.execute("SELECT * FROM original_childcare_facilities ORDER BY id ASC LIMIT 1")
+            row = self.cursor.fetchone()  # Fetch the first record
+            
+            if row:  # If a record exists
+                facility = facilityClass(
+                    facilityId=row["id"],
+                    region=row["region"],
+                    district=row["district"],
+                    licenceNum=row["licenceNum"],
+                    facilityName=row["facilityName"],
+                    facilityType=row["facilityType"],
+                    facilityAddress1=row["facilityAddress1"],
+                    facilityAddress2=row["facilityAddress2"],
+                    facilityAddress3=row["facilityAddress3"],
+                    maxNumofChildren=row["maxNumofChildren"],
+                    maxNumInfants=row["maxNumInfants"],
+                    maxNumPreChildren=row["maxNumPreChildren"],
+                    maxNumSAgeChildren=row["maxNumSAgeChildren"],
+                    LangOfService=row["LangOfService"],
+                    operatorId=row["operatorId"],
+                    designatedFacility=row["designatedFacility"],
+                )
+                print("Loading one cuz Tanek Stuttgraham 041012512")
+                self.record_list = [facility]  # Store the facility in record_list
+                return facility
+                
+            else:
+                print("No facility records found in the database.")
+                return None
+        except mysql.connector.Error as e:
+            print(f"Database Error: {e}")
+            return None
         
     def add_to_changed_facilities(self, facility):
         """Adds a facility record to Changed childcare facility table."""
@@ -154,7 +191,7 @@ class FacilityModel:
         facility.facilityId = fetchedId['LAST_INSERT_ID()']
         
         self.record_list.append(facility)
-        print("Facility Added to Changed Facilty Table Successfully")
+        print("Facility Added to Changed Facilty Table Successfully.Tanek Stuttgraham 041012512")
         
 
     def save_facilities(self):
@@ -201,7 +238,7 @@ class FacilityModel:
             
             # Commit transaction after inserting all records
             self.conn.commit()
-            print("All Facilities Saved Successfully")
+            print("All Facilities Saved Successfully. Tanek Stuttgraham 041012512")
 
         except mysql.connector.Error as e:
             print(f"Database error: {e}")
@@ -214,9 +251,13 @@ class FacilityModel:
             return
         try:
             prepared_sql = f"UPDATE changed_childcare_facilities SET 	{', '.join(f'{k} = %s' for k in updatedValues.keys())} WHERE id = %s"
+            print("Executing SQL:", prepared_sql)
+            print("With values:", (*updatedValues.values(), facilityId))
+
             self.cursor.execute(prepared_sql, (*updatedValues.values(), facilityId))
+            
             self.conn.commit()
-            print("Updated Succesfully")
+            print("Updated Succesfully. Tanek Stuttgraham 041012512")
         except mysql.connector.Error as e:
             print("Sql Error : {e} ")
             
@@ -238,7 +279,7 @@ class FacilityModel:
                     
                     # Remove from record_list
                     self.record_list = [facility for facility in self.record_list if facility.facilityId != facilityId]
-                    print(f"Facility with ID {facilityId} removed from record_list.")
+                    print(f"Facility with ID {facilityId} removed from record_list. Tanek Stuttgraham 041012512")
                 else:
                     print("Facility deletion failed")
             except mysql.connector.Error as e:

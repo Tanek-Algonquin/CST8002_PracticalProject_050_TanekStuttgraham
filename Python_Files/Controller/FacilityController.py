@@ -59,6 +59,15 @@ class FacilityController:
         except ValueError:
             print("Error: Please enter valid numerical values for child capacities.")
             
+    def get_first_available_facility(self):
+        """Fetch the first available facility and update the view."""
+        facility = self.model.get_first_available_facility()
+        if facility:
+            self.view.update_facility_list()  # Refresh the Treeview
+        else:
+            self.view.show_message("No facility records found.")
+        
+    
     def get_edited_facility_data(self):
         """Retrieve edited facility data from the UI."""
         facility_data = {key: self.edit_fields[key].get() for key in self.edit_fields}
@@ -89,10 +98,11 @@ class FacilityController:
         return None
     
     def update_facility(self, index, facility_data):
-        """Update an existing facility in the model."""
+        """Update an existing facility in the model and persist it to the database."""
         if 0 <= index < len(self.model.record_list):
             facility = self.model.record_list[index]
 
+            # Update in-memory record
             facility.region = facility_data["Region"]
             facility.district = facility_data["District"]
             facility.licenceNum = facility_data["Licence Number"]
@@ -109,6 +119,28 @@ class FacilityController:
             facility.operatorId = facility_data["Operator Id"]
             facility.designatedFacility = facility_data["Designated Facility"]
 
+            # Persist changes to the database
+            updated_values = {  
+                "region": facility.region,
+                "district": facility.district,
+                "licenceNum": facility.licenceNum,
+                "facilityName": facility.facilityName,
+                "facilityType": facility.facilityType,
+                "facilityAddress1": facility.facilityAddress1,
+                "facilityAddress2": facility.facilityAddress2,
+                "facilityAddress3": facility.facilityAddress3,
+                "maxNumofChildren": facility.maxNumofChildren,
+                "maxNumInfants": facility.maxNumInfants,
+                "maxNumPreChildren": facility.maxNumPreChildren,
+                "maxNumSAgeChildren": facility.maxNumSAgeChildren,
+                "LangOfService": facility.LangOfService,
+                "operatorId": facility.operatorId,
+                "designatedFacility": facility.designatedFacility
+            }
+
+            self.model.update_in_changed_facilities(facility.facilityId, updated_values)
+
+            # Refresh the Treeview
             self.view.update_facility_list()
 
     def delete_facility(self, facilityId):

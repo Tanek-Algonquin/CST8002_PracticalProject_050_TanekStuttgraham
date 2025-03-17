@@ -15,8 +15,8 @@ class TestFacilityModel(unittest.TestCase):
     def setUp(self):
         """Set up testing environment before test is ran"""
         self.model = FacilityModel() #FacilityModel instance
-        self.model.load_from_csv()  # Load all records from CSV
-        self.test_facility = self.model.load_one_from_csv(0)    
+        self.model.
+        self.test_facility = self.model.load_original_facilities()    
     def test_loading(self):
         """Tests to see if csv is loaded into memory. If number loaded is greater than zero."""
         self.assertGreater(len(self.model.record_list), 0, "No Records Loaded")
@@ -32,16 +32,7 @@ class TestFacilityModel(unittest.TestCase):
         self.assertIsInstance(self.test_facility.LangOfService, str)
         self.assertIsInstance(self.test_facility.operatorId, str)
         self.assertIsInstance(self.test_facility.designatedFacility, str)
-    def test_save_facilities(self):
-        """Tests the saving of facilities to a CSV"""
-        saving_file_path = "C:/AAFINAL-SEMESTER/Programming Language Research Project/Practical_Project/Saved_Facility_CSV.csv"
-        self.model.save_facilities()  # Save the facilities data
-        # Verify if the file was created
-        self.assertTrue(os.path.exists(saving_file_path), "Saved file does not exist")
-        with open(saving_file_path, mode='r') as file:
-            csvFile = csv.reader(file)
-            header = next(csvFile)
-            self.assertIn('Region', header, "Header 'Region' not found in saved CSV")
+       
     def tearDown(self):
         """Cleanup method """
         self.model = None
