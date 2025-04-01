@@ -1,5 +1,8 @@
 use pythondb;
-DROP TABLE childcare_facilities;
+select *  FROM changed_childcare_facilities;
+Select * from original_childcare_facilities;
+SELECT * FROM changed_childcare_facilities;
+INSERT INTO changed_childcare_facilities SELECT * FROM original_childcare_facilities;
 CREATE TABLE original_childcare_facilities (
     id INT AUTO_INCREMENT PRIMARY KEY,       -- Unique identifier for each record
     region VARCHAR(255),                     -- Region where the facility is located

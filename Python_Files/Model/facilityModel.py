@@ -32,13 +32,10 @@ class FacilityModel:
         try:
             self.cursor.execute("SELECT * FROM original_childcare_facilities")
             rows = self.cursor.fetchall()  # Fetch all rows as dictionaries
-            
-            # Convert each dictionary into a facilityClass instance
-            self.record_list = []
+            self.record_list = [] # Memory record of objects
+            # Convert each dictionary into a facilityClass instance      
             for row in rows:
-          
                 facility = facilityClass(
-                    
                     facilityId=row["id"],
                     region=row["region"],
                     district=row["district"],
@@ -54,14 +51,11 @@ class FacilityModel:
                     maxNumSAgeChildren=row["maxNumSAgeChildren"],
                     LangOfService=row["LangOfService"],
                     operatorId=row["operatorId"],
-                    designatedFacility=row["designatedFacility"],
-                    
+                    designatedFacility=row["designatedFacility"], 
                 )
-                print("Loaded Original Table. Tanek Stuttgraham 041012512")
                 self.record_list.append(facility)
-            
-            return self.record_list  # Make sure this return is inside the try block
-
+            print("Loaded Original Table. Tanek Stuttgraham 041012512")
+            return self.record_list  
         except mysql.connector.Error as e:
             print(f"Database Error: {e}")
             return []  # Return an empty list if there's a database error
@@ -93,10 +87,10 @@ class FacilityModel:
                     designatedFacility=row["designatedFacility"],
                     
                 )
-                print("Loaded Changed Tabel. Tanek Stuttgraham 041012512")
+                
                 self.record_list.append(facility)
-            
-            return self.record_list  # Make sure this return is inside the try block
+            print("Loaded Changed Tabel. Tanek Stuttgraham 041012512")
+            return self.record_list  
 
         except mysql.connector.Error as e:
             print(f"Database Error: {e}")
@@ -262,7 +256,16 @@ class FacilityModel:
             print("Sql Error : {e} ")
             
                         
-
+    def delete_changed_facilities(self):
+        """Deletes everything in the changed childcare facilities table."""
+        try:
+            prepared_sql = "DELETE FROM changed_childcare_facilities"
+            self.cursor.execute(prepared_sql)
+            print("Deleted All from changed Table")
+            self.conn.commit()
+        except mysql.connector.Error as e:
+                print(f"Database Error: {e}")
+            
     def delete_facility(self, facilityId):
             """Delete a facility from changed_childcare_facilities."""
             try:

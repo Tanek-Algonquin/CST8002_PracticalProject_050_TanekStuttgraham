@@ -1,5 +1,7 @@
+import matplotlib.pyplot as plt
 from Model.facilityModel import FacilityModel
 from Model.facilityClass import facilityClass
+
 
 class FacilityController:
     """Facility Controller manipulates the model based on event cues from the view class."""
@@ -7,13 +9,23 @@ class FacilityController:
         """Initialize the controller with a model and a view."""
         self.model = model
         self.view = view
-
+       
+    def plot_test(self):
+        x = [1, 2, 3]
+        y = [ 2, 4, 6]
+        
+        self.plt.plot(x, y)
+        self.plt.title('My First Graph')
+        self.plt.xlabel('First X-Axis')
+        self.plt.ylabel('First Y-Axis')
+        
     def load_facilities(self):
         """Load facilities from DB into the model."""
         self.model.load_all_changed_facilities()
         self.view.update_facility_list()
         
     def load_original_to_changed(self):
+        """Calls on model, load_original_to_changed method. Then calls the view to reflect the change."""
         self.model.load_original_to_changed()
         self.view.update_facility_list()
     
@@ -26,6 +38,10 @@ class FacilityController:
         """Loads one facility from CSV into memory"""
         self.model.load_changed_facility_by_id(facilityId)
         self.view.update_facility_list()
+        
+    def get_changed_facility_by_id(self, facilityId):
+        """Fetches a changed facility from the database and returns it to the view."""
+        return self.model.load_changed_facility_by_id(facilityId)
             
             
     def save_facilities(self):
@@ -146,5 +162,9 @@ class FacilityController:
     def delete_facility(self, facilityId):
         """Delete a facility from the model based on Facility Id."""
         self.model.delete_facility(facilityId)
+        self.view.update_facility_list()
+    
+    def delete_changed_facilities(self):
+        self.model.delete_changed_facilities()
         self.view.update_facility_list()
         

@@ -4,60 +4,74 @@ from Controller.FacilityController import FacilityController  # Import Controlle
 
 
 class FacilityView:
+    """The visual representation for this program. Creates a window with a datatable with buttons intended to manipulate the contents of the table."""
     def __init__(self, root, controller):
         """Initialize the view with the main window and connect it to the controller."""
         self.root = root
         self.controller = controller
         self.root.title("Tanek Stuttgraham's Facility Management System 041012512")
         self.current_index = None
+        
         # Defining columns makes building view easier
-        self.displayed_columns = [
-           "Facility Name", "Facility Id", "Facility Type", "Region", "District", "Max Number of Children"
-        ]
+        self.displayed_columns = ["Facility Name", "Facility Type", "Facility Id", "Region",
+                                  "District", "Main Add", "Province", "Postal",
+                                  "Children #", "Infant #", "P-A Child #", "S-A Child #",
+                                  "Language", "Op. Id", "Facilities #", "Licence #"]
+        
         # Create a TreeView Widget
         self.facility_tree = ttk.Treeview(self.root, columns=self.displayed_columns, show="headings", height=10)
         # Pass column headers to row building loop
         for col in self.displayed_columns:
             self.facility_tree.heading(col, text=col)
-            self.facility_tree.column(col, width=150, anchor="center")
-        # Sticky nsew lets grid expand in any direction
-        self.facility_tree.grid(row=0, column=0, columnspan=4, padx=9, pady=10, sticky="nsew")
+            self.facility_tree.column(col, width=75, anchor="center")
+        
+        # Grid the Treeview widget in the first row, first column and make it expand
+        self.facility_tree.grid(row=0, column=0, columnspan=3, padx=9, pady=10, sticky="nsew")
+        
         # Add scrollbar to the TreeView
         self.scrollbar = ttk.Scrollbar(self.root, orient="vertical", command=self.facility_tree.yview)
+        self.scrollbar.grid(row=0, column=5, sticky="ns")  # Place the scrollbar in the last column
+        
+        # Configure the Treeview to use the scrollbar
         self.facility_tree.configure(yscroll=self.scrollbar.set)
-        self.scrollbar.grid(row=0, column=4, sticky="ns")
+        
         # Create buttons for various actions
         self.create_buttons()
 
     def create_buttons(self):
         """Create buttons to interact with the controller."""
-        
-        self.load_button = tk.Button(self.root, text="Load Updated Facilities", command=self.load_facilities)
+        #Uniform Button Size
+        button_width = 22
+        button_height = 2
+        # Place buttons across different columns in row 1 to ensure proper spacing
+        self.load_button = tk.Button(self.root, text="Load Updated Facilities", command=self.load_facilities, width= button_width, height= button_height )
         self.load_button.grid(row=1, column=1, padx=5, pady=5)
 
-        self.next_button = tk.Button(self.root,  text="Load Original Facilities", command=self.load_original_facilities)
+        self.next_button = tk.Button(self.root,  text="Load Original Facilities", command=self.load_original_facilities, width= button_width, height= button_height)
         self.next_button.grid(row=1, column=0, padx=5, pady=5)
-        """
-        self.next_button = tk.Button(self.root,  text="Load One From Original Facilities", command=self.load_one_original_facility)
-        self.next_button.grid(row=1, column=2, padx=5, pady=5)
-        """
-        self.next_button = tk.Button(self.root,  text="Reset Changed Facilities List", command=self.load_original_to_changed)
-        self.next_button.grid(row=1, column=3, padx=5, pady=5)
-       
-        self.save_button = tk.Button(self.root, text="Save Facilities", command=self.save_facilities)
-        self.save_button.grid(row=1, column=4, padx=5, pady=5)
-
-        self.add_button = tk.Button(self.root, text="Add Facility", command=self.open_add_facility_window)
-        self.add_button.grid(row=1, column=5, padx=5, pady=5)
         
-        self.edit_button = tk.Button(self.root, text="Edit Facility", command=self.open_edit_facility_window)
-        self.edit_button.grid(row=1, column=6, padx=5, pady=5)
+        self.next_button = tk.Button(self.root,  text="Reset Changed Facilities List", command=self.load_original_to_changed, width= button_width, height= button_height)
+        self.next_button.grid(row=1, column=2, padx=5, pady=5) 
+       
+        self.bar_graph_button = tk.Button(self.root, text="Bar Graph", command=self.plot_test, width= button_width, height= button_height)
+        self.bar_graph_button.grid(row=1, column=3, padx=5, pady=5)
 
-        self.delete_button = tk.Button(self.root, text="Delete Facility", command=self.delete_facility)
-        self.delete_button.grid(row=1, column=7, padx=5, pady=5)
+        self.add_button = tk.Button(self.root, text="Add Facility", command=self.open_add_facility_window, width= button_width, height= button_height)
+        self.add_button.grid(row=2, column=0, padx=5, pady=5)
+        
+        self.edit_button = tk.Button(self.root, text="Edit Facility", command=self.open_edit_facility_window, width= button_width, height= button_height)
+        self.edit_button.grid(row=2, column=1, padx=5, pady=5)
 
-        self.show_more_button = tk.Button(self.root, text="Show More Details", command=self.show_more_details)
-        self.show_more_button.grid(row=1, column=8, padx=5, pady=5)
+        self.delete_button = tk.Button(self.root, text="Delete Selected Facility", command=self.delete_facility, width= button_width, height= button_height)
+        self.delete_button.grid(row=2, column=2, padx=5, pady=5)
+        
+        self.delete_button = tk.Button(self.root, text="Delete Changed Facilities", command=self.delete_changed_facilities, width= button_width, height= button_height)
+        self.delete_button.grid(row=2, column=3, padx=5, pady=5)
+
+
+     
+    def plot_test(self):
+        self.controller.plot_test()
         
     def load_one_original_facility(self):
         """Load  the first one."""
@@ -257,7 +271,7 @@ class FacilityView:
             # Convert numerical values for child capacities
             numerical_keys = [
                 "Max Number of Children", "Max Number of Infants",
-            "Max-Number-of-Preschool-Aged-Children", "Max-Number-of-School-Age-Children"
+            "Max-Number-of-Preschool-Aged-Children", "Max Number of School Age Children"
             ]
             for key in numerical_keys:
                 facility_data[key] = int(facility_data[key])
@@ -299,7 +313,12 @@ class FacilityView:
 
         # Refresh the list
         self.update_facility_list()
-
+        
+        
+    def delete_changed_facilities(self):
+        self.controller.delete_changed_facilities()
+        self.controller.model.record_list = [] #refresh local memory
+        self.update_facility_list()
         
     def open_edit_facility_window(self):
         """Opens a window that allows editing facilities"""
@@ -353,5 +372,8 @@ class FacilityView:
         # Insert new facility data
         for facility in self.controller.model.record_list:
             self.facility_tree.insert("", "end", values=[
-                facility.facilityName, facility.facilityId, facility.facilityType, facility.region, facility.district, facility.maxNumofChildren
+                facility.facilityName, facility.facilityType, facility.facilityId,  facility.region,
+                facility.district, facility.facilityAddress1, facility.facilityAddress2, facility.facilityAddress3,
+                facility.maxNumofChildren, facility.maxNumInfants, facility.maxNumPreChildren, facility.maxNumSAgeChildren,
+                facility.LangOfService, facility.operatorId, facility.designatedFacility, facility.licenceNum
             ])
