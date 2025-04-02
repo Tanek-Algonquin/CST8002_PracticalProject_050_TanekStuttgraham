@@ -1,4 +1,4 @@
-import matplotlib.pyplot as plt
+
 from Model.facilityModel import FacilityModel
 from Model.facilityClass import facilityClass
 
@@ -9,20 +9,26 @@ class FacilityController:
         """Initialize the controller with a model and a view."""
         self.model = model
         self.view = view
-       
-    def plot_test(self):
-        x = [1, 2, 3]
-        y = [ 2, 4, 6]
-        
-        self.plt.plot(x, y)
-        self.plt.title('My First Graph')
-        self.plt.xlabel('First X-Axis')
-        self.plt.ylabel('First Y-Axis')
         
     def load_facilities(self):
         """Load facilities from DB into the model."""
         self.model.load_all_changed_facilities()
         self.view.update_facility_list()
+        
+    def get_facility_chart_data(self):
+        """Fetch facility type counts from the record list for plotting."""
+        facility_counts = {}
+
+        for facility in self.model.record_list:
+            facility_type = facility.facilityType  # Get facility type
+            facility_counts[facility_type] = facility_counts.get(facility_type, 0) + 1  # Count occurrences
+        
+        # Convert dictionary to lists for plotting
+        categories = list(facility_counts.keys())
+        values = list(facility_counts.values())
+
+        return categories, values
+
         
     def load_original_to_changed(self):
         """Calls on model, load_original_to_changed method. Then calls the view to reflect the change."""

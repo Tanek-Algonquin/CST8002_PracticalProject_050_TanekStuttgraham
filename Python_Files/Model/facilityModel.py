@@ -26,7 +26,9 @@ class FacilityModel:
             
         except mysql.connector.Error as e:
             print(f"Database Error: {e}")
-    
+            
+    def fetch_record_list(self):
+        return  self.record_list
     def load_original_facilities(self):
         """Method loads All records from original_childcare_facilities table and converts them to facilityClass instances."""
         try:

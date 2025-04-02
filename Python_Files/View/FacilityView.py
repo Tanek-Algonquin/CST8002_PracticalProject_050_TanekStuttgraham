@@ -1,4 +1,6 @@
 import tkinter as tk
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from tkinter import ttk, messagebox
 from Controller.FacilityController import FacilityController  # Import Controller
 
@@ -53,7 +55,7 @@ class FacilityView:
         self.next_button = tk.Button(self.root,  text="Reset Changed Facilities List", command=self.load_original_to_changed, width= button_width, height= button_height)
         self.next_button.grid(row=1, column=2, padx=5, pady=5) 
        
-        self.bar_graph_button = tk.Button(self.root, text="Bar Graph", command=self.plot_test, width= button_width, height= button_height)
+        self.bar_graph_button = tk.Button(self.root, text="Bar Graph", command=self.show_bar_graph_window, width= button_width, height= button_height)
         self.bar_graph_button.grid(row=1, column=3, padx=5, pady=5)
 
         self.add_button = tk.Button(self.root, text="Add Facility", command=self.open_add_facility_window, width= button_width, height= button_height)
@@ -70,8 +72,26 @@ class FacilityView:
 
 
      
-    def plot_test(self):
-        self.controller.plot_test()
+    def show_bar_graph_window(self):
+        """Opens a new window and displays a bar graph."""
+        graph_window = tk.Toplevel(self.root)
+        graph_window.title("Facility Bar Graph")
+        graph_window.geometry("600x400")  # Set window size
+
+        # Fetch data from Controller
+        categories, values = self.controller.get_facility_chart_data()
+
+        # Create Matplotlib figure
+        fig, ax = plt.subplots(figsize=(6, 4))
+        ax.bar(categories, values, color='blue')
+        ax.set_title('Facility Distribution')
+        ax.set_xlabel('Facility Type')
+        ax.set_ylabel('Number of Facilities')
+
+        # Embed Matplotlib chart in Tkinter window
+        canvas = FigureCanvasTkAgg(fig, master=graph_window)
+        canvas.draw()
+        canvas.get_tk_widget().pack()
         
     def load_one_original_facility(self):
         """Load  the first one."""
@@ -126,90 +146,6 @@ class FacilityView:
         # Adds a previous Buttom to the bottom
         previous_button = tk.Button(details_window, text="Previous Record", command=lambda: self.show_more_details_by_index(self.current_index-1))
         previous_button.pack(pady=10)
-    def show_more_details_by_index(self, index):
-        """Shows facility Details page based on index, used by Next and Previous."""
-        # Ensure index is within valid range
-        if index < 0 or index >= len(self.controller.model.record_list):
-            return  # Do nothing if out of bounds
-        self.current_index = index  # Update the index before opening the new window
-        facility = self.controller.model.record_list[self.current_index]
-        details_window = tk.Toplevel(self.root)
-        details_window.title(f"Tanek Stuttgraham's Details for {facility.facilityName} page 041012512")
-        # Create a frame to contain the labels
-        frame = tk.Frame(details_window)
-        frame.pack(padx=50, pady=40)
-        # Label Keys and Data
-        details_list = [
-            ("Region", facility.region),
-            ("District", facility.district),
-            ("License Number", facility.licenceNum),
-            ("Facility Name", facility.facilityName),
-            ("Facility Type", facility.facilityType),
-            ("Primary Address", facility.facilityAddress1),
-            ("Secondary Address", facility.facilityAddress2),
-            ("Tertiary Address", facility.facilityAddress3),
-            ("Max Number of Children", facility.maxNumofChildren),
-            ("Max Number of Infants", facility.maxNumInfants),
-            ("Max Number of Preschool-Aged Children", facility.maxNumPreChildren),
-            ("Max Number of School-Aged Children", facility.maxNumSAgeChildren),
-            ("Language of Service", facility.LangOfService),
-            ("Operator ID", facility.operatorId),
-            ("Designated Facility", facility.designatedFacility)
-        ]
-        # Create labels for each detail
-        row = 0
-        for label, value in details_list:
-            tk.Label(frame, text=f"{label}: {value}", anchor="w", width=40, justify="left").grid(row=row, column=0, padx=5, pady=10, sticky="w")
-            row += 1
-        # Adds a next Buttom to the bottom
-        next_button = tk.Button(details_window, text="Next Record", command=lambda: self.show_more_details_by_index(self.current_index+1))
-        next_button.pack(pady=10)
-        # Add a close button at the bottom
-        close_button = tk.Button(details_window, text="Close", command=details_window.destroy)
-        close_button.pack(pady=10)
-        # Adds a previous Buttom to the bottom
-        previous_button = tk.Button(details_window, text="Previous Record", command=lambda: self.show_more_details_by_index(self.current_index-1))
-        previous_button.pack(pady=10)
-    def next_record_button(self):
-        """Show the next record or loop back to the first one."""
-        if not self.controller.model.record_list:
-            messagebox.showinfo("No records", "No facilities have been loaded yet.")
-            return
-        # Initialize index if not set
-        if self.current_index is None:
-            self.current_index = 0
-        else:
-            # Move to next record, loop back to 0 if at end
-            self.current_index = (self.current_index + 1) % len(self.controller.model.record_list)
-        # Show details using index-based 
-        self.show_more_details_by_index(self.current_index)
-
-    def previous_record_button(self):
-        """Show the next record or loop back to the first one."""
-        if not self.controller.model.record_list:
-            messagebox.showinfo("No records", "No facilities have been loaded yet.")
-            return
-
-        # Initialize index if not set
-        if self.current_index is None:
-            self.current_index = 0
-        else:
-            # Move to next record, loop back to 0 if at end
-            self.current_index = (self.current_index - 1) % len(self.controller.model.record_list)
-
-        # Show details using index-based function
-        self.show_more_details_by_index(self.current_index)
-        
-    def load_selected_or_first_record(self):
-            """Load the selected record or the first facility if nothing is selected."""
-            selected_row = self.facility_tree.selection()
-
-            if selected_row:
-                selected_index = self.facility_tree.index(selected_row)
-            else:
-                selected_index = 0  # Default to first facility
-
-            self.show_more_details_by_index(selected_index)
             
     def load_original_to_changed(self):
         """Loads original list into changed list"""
@@ -316,6 +252,7 @@ class FacilityView:
         
         
     def delete_changed_facilities(self):
+        """Resets the Changed facility list"""
         self.controller.delete_changed_facilities()
         self.controller.model.record_list = [] #refresh local memory
         self.update_facility_list()
