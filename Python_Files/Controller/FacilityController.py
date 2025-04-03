@@ -15,17 +15,17 @@ class FacilityController:
         self.model.load_all_changed_facilities()
         self.view.update_facility_list()
         
-    def get_facility_chart_data(self):
+    def get_facility_chart_data(self, column_name):
         """Fetch facility type counts from the record list for plotting."""
-        facility_counts = {}
+        column_counts  = {}
 
         for facility in self.model.record_list:
-            facility_type = facility.facilityType  # Get facility type
-            facility_counts[facility_type] = facility_counts.get(facility_type, 0) + 1  # Count occurrences
+            value = getattr(facility, column_name)
+            column_counts [value] = column_counts .get(value, 0) + 1  # Count occurrences
         
         # Convert dictionary to lists for plotting
-        categories = list(facility_counts.keys())
-        values = list(facility_counts.values())
+        categories = list(column_counts .keys())
+        values = list(column_counts .values())
 
         return categories, values
 

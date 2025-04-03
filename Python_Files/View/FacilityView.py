@@ -49,11 +49,11 @@ class FacilityView:
         self.load_button = tk.Button(self.root, text="Load Updated Facilities", command=self.load_facilities, width= button_width, height= button_height )
         self.load_button.grid(row=1, column=1, padx=5, pady=5)
 
-        self.next_button = tk.Button(self.root,  text="Load Original Facilities", command=self.load_original_facilities, width= button_width, height= button_height)
-        self.next_button.grid(row=1, column=0, padx=5, pady=5)
+        self.load_og_facilities = tk.Button(self.root,  text="Load Original Facilities", command=self.load_original_facilities, width= button_width, height= button_height)
+        self.load_og_facilities.grid(row=1, column=0, padx=5, pady=5)
         
-        self.next_button = tk.Button(self.root,  text="Reset Changed Facilities List", command=self.load_original_to_changed, width= button_width, height= button_height)
-        self.next_button.grid(row=1, column=2, padx=5, pady=5) 
+        self.reset_changed_facilities = tk.Button(self.root,  text="Reset Changed Facilities List", command=self.load_original_to_changed, width= button_width, height= button_height)
+        self.reset_changed_facilities.grid(row=1, column=2, padx=5, pady=5) 
        
         self.bar_graph_button = tk.Button(self.root, text="Bar Graph", command=self.show_bar_graph_window, width= button_width, height= button_height)
         self.bar_graph_button.grid(row=1, column=3, padx=5, pady=5)
@@ -71,28 +71,120 @@ class FacilityView:
         self.delete_button.grid(row=2, column=3, padx=5, pady=5)
 
 
-     
     def show_bar_graph_window(self):
-        """Opens a new window and displays a bar graph."""
+        """Opens a new window and displays a bar graph for the selected row, or allows user to choose a category if no row is selected."""
+        selected_item = self.facility_tree.selection()  # Get selected row
+        
+        if selected_item:
+            # Get the record data
+            record = self.facility_tree.item(selected_item[0], "values")
+            
+            # Print the selected record for debugging or inspection
+            print("Selected Record Data:", record)
+            
+            # If you want to print each field with its column name for clarity
+            for i, col_name in enumerate(self.displayed_columns):
+                print(f"{col_name}: {record[i]}")
+            
+            self.generate_graph_from_record(record)  # Call method to generate graph for record
+        else:
+            # Create a window for manual column selection
+            self.create_graph_window()
+    
+    def generate_graph_from_record(self, record):
+        """Generate a bar graph using the data from a selected record, including only the max children and infant stats."""
+        # Define graph window
         graph_window = tk.Toplevel(self.root)
-        graph_window.title("Facility Bar Graph")
-        graph_window.geometry("600x400")  # Set window size
+        graph_window.title(f"Facility Record Bar Graph for {record[0]}")  # Using Facility Name for the title
+        graph_window.geometry("800x500")
 
-        # Fetch data from Controller
-        categories, values = self.controller.get_facility_chart_data()
+        # Define columns to include in the graph (max children and infant stats)
+        stats_columns = ["Children #", "Infant #", "P-A Child #", "S-A Child #"]
+        
+        # Extract the data for these specific columns
+        filtered_columns = [col for col in stats_columns]
+        filtered_values = []
+        for col in filtered_columns:
+            # Get the index of the column in the displayed columns
+            index = self.displayed_columns.index(col)
+            
+            # Get the value from the record for the current column
+            value = record[index]
+            
+            # Convert to integer if it's a digit, otherwise set to 0
+            filtered_values.append(int(value) if str(value).isdigit() else 0)
 
-        # Create Matplotlib figure
-        fig, ax = plt.subplots(figsize=(6, 4))
-        ax.bar(categories, values, color='blue')
-        ax.set_title('Facility Distribution')
-        ax.set_xlabel('Facility Type')
-        ax.set_ylabel('Number of Facilities')
+
+        # Create bar graph
+        fig, ax = plt.subplots(figsize=(8, 5))
+        ax.bar(filtered_columns, filtered_values, color='blue')
+        ax.set_title("Children and Infant Statistics")
+        ax.set_xlabel("Category")
+        ax.set_ylabel("Number of Facilities")
+
+        plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
+        fig.tight_layout()
 
         # Embed Matplotlib chart in Tkinter window
-        canvas = FigureCanvasTkAgg(fig, master=graph_window)
-        canvas.draw()
-        canvas.get_tk_widget().pack()
-        
+        canvas_figure = FigureCanvasTkAgg(fig, master=graph_window)
+        canvas_figure.draw()
+        canvas_figure.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+
+
+    def create_graph_window(self):
+        """Creates a window allowing the user to select a column for the bar graph."""
+        graph_window = tk.Toplevel(self.root)
+        graph_window.title("Facility Bar Graph")
+        graph_window.geometry("1000x600")
+
+        frame = tk.Frame(graph_window)
+        frame.pack(fill=tk.BOTH, expand=1)
+
+        canvas = tk.Canvas(frame)
+        canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
+
+        scrollbar = tk.Scrollbar(frame, orient=tk.VERTICAL, command=canvas.yview)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        canvas.configure(yscrollcommand=scrollbar.set)
+        canvas.bind('<Configure>', lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+
+        inner_frame = tk.Frame(canvas)
+        canvas.create_window((0, 0), window=inner_frame, anchor="nw")
+
+        column_options = ["facilityType", "region", "district", "LangOfService"]
+        selected_column = tk.StringVar(graph_window)
+        selected_column.set(column_options[0])  # Default selection
+
+        dropdown_label = tk.Label(inner_frame, text="Select Column:")
+        dropdown_label.pack()
+        dropdown_menu = tk.OptionMenu(inner_frame, selected_column, *column_options)
+        dropdown_menu.pack()
+
+        def generate_graph():
+            column = selected_column.get()
+            categories, values = self.controller.get_facility_chart_data(column)
+
+            fig, ax = plt.subplots(figsize=(9, 6))
+            ax.bar(categories, values, color='blue')
+            ax.set_title(f'Facility Distribution by {column}')
+            ax.set_xlabel(column)
+            ax.set_ylabel('Number of Facilities')
+
+            plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
+            fig.tight_layout()
+
+            canvas_figure = FigureCanvasTkAgg(fig, master=inner_frame)
+            canvas_figure.draw()
+            canvas_figure.get_tk_widget().pack()
+
+            inner_frame.update_idletasks()
+            canvas.configure(scrollregion=canvas.bbox("all"))
+
+        generate_button = tk.Button(inner_frame, text="Generate Graph", command=generate_graph)
+        generate_button.pack()
+
+            
     def load_one_original_facility(self):
         """Load  the first one."""
        
@@ -207,7 +299,7 @@ class FacilityView:
             # Convert numerical values for child capacities
             numerical_keys = [
                 "Max Number of Children", "Max Number of Infants",
-            "Max-Number-of-Preschool-Aged-Children", "Max Number of School Age Children"
+            "Max-Number-of-Preschool-Aged-Children", "Max-Number-of-School-Age-Children"
             ]
             for key in numerical_keys:
                 facility_data[key] = int(facility_data[key])
