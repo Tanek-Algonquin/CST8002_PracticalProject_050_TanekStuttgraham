@@ -18,7 +18,7 @@ if repo.is_dirty() or repo.untracked_files:
     repo.git.add(A=True)  # Add all changes (modified and untracked files)
     
     # Commit the changes
-    commit_message = "Got a Graph Working for individual rows. V4.2"
+    commit_message = "Added a button bind to let selected rows get unselected. V4.3"
     repo.index.commit(commit_message)
     
     # Print commit message

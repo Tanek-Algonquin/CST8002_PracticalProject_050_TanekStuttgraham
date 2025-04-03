@@ -13,6 +13,8 @@ class FacilityView:
         self.controller = controller
         self.root.title("Tanek Stuttgraham's Facility Management System 041012512")
         self.current_index = None
+        self.root.bind("<Button-1>", self.clear_tree_selection)
+
         
         # Defining columns makes building view easier
         self.displayed_columns = ["Facility Name", "Facility Type", "Facility Id", "Region",
@@ -119,8 +121,8 @@ class FacilityView:
         fig, ax = plt.subplots(figsize=(8, 5))
         ax.bar(filtered_columns, filtered_values, color='blue')
         ax.set_title("Children and Infant Statistics")
-        ax.set_xlabel("Category")
-        ax.set_ylabel("Number of Facilities")
+        ax.set_xlabel("Type of Children")
+        ax.set_ylabel("Number of Children")
 
         plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
         fig.tight_layout()
@@ -190,6 +192,13 @@ class FacilityView:
        
         self.controller.get_first_available_facility()
         self.update_facility_list()
+        
+    def clear_tree_selection(self, event):
+        """Clears the selection in the Treeview when clicking outside of it."""
+        widget = event.widget
+        if widget != self.facility_tree and not isinstance(widget, tk.Button):  # If the clicked widget is NOT the Treeview or a button
+            self.facility_tree.selection_remove(self.facility_tree.selection())  # Clear selection
+        
         
     def show_more_details(self):
         """Open a window with full facility data shown."""
