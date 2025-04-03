@@ -97,32 +97,34 @@ class FacilityView:
         """Generate a bar graph using the data from a selected record, including only the max children and infant stats."""
         # Define graph window
         graph_window = tk.Toplevel(self.root)
-        graph_window.title(f"Facility Record Bar Graph for {record[0]}")  # Using Facility Name for the title
+        graph_window.title(f"Facility Record Bar Graph for {record[0]}")  # Facility Name in title
         graph_window.geometry("800x500")
 
         # Define columns to include in the graph (max children and infant stats)
         stats_columns = ["Children #", "Infant #", "P-A Child #", "S-A Child #"]
-        
-        # Extract the data for these specific columns
-        filtered_columns = [col for col in stats_columns]
-        filtered_values = []
-        for col in filtered_columns:
-            # Get the index of the column in the displayed columns
-            index = self.displayed_columns.index(col)
-            
-            # Get the value from the record for the current column
-            value = record[index]
-            
-            # Convert to integer if it's a digit, otherwise set to 0
-            filtered_values.append(int(value) if str(value).isdigit() else 0)
 
+        # Extract the data for these specific columns
+        filtered_values = []
+        for col in stats_columns:
+            index = self.displayed_columns.index(col)  # Get index in displayed columns
+            value = record[index]  # Get the corresponding value
+            filtered_values.append(int(value) if str(value).isdigit() else 0)
 
         # Create bar graph
         fig, ax = plt.subplots(figsize=(8, 5))
-        ax.bar(filtered_columns, filtered_values, color='blue')
+        bars = ax.bar(stats_columns, filtered_values, color='blue')
+
+        # Add values to bars so they sit exactly on top
+        for bar, value in zip(bars, filtered_values):
+            ax.text(bar.get_x() + bar.get_width() / 2,  # Centered on X-axis
+                    bar.get_height(),  # Y position at the top of the bar
+                    f'{value}',  # Text to display
+                    ha='center', va='bottom',  # Align text center & just above the bar
+                    fontsize=10, fontweight='bold', color='black')
+
         ax.set_title("Children and Infant Statistics")
-        ax.set_xlabel("Type of Children")
-        ax.set_ylabel("Number of Children")
+        ax.set_xlabel("Category")
+        ax.set_ylabel("Number of Facilities")
 
         plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
         fig.tight_layout()
@@ -131,6 +133,7 @@ class FacilityView:
         canvas_figure = FigureCanvasTkAgg(fig, master=graph_window)
         canvas_figure.draw()
         canvas_figure.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+
 
 
     def create_graph_window(self):
@@ -168,7 +171,18 @@ class FacilityView:
             categories, values = self.controller.get_facility_chart_data(column)
 
             fig, ax = plt.subplots(figsize=(9, 6))
-            ax.bar(categories, values, color='blue')
+            bars = ax.bar(categories, values, color='blue')
+            
+            # Add values on top of bars
+            for bar, value in zip(bars, values):
+                ax.text(
+                    bar.get_x() + bar.get_width() / 2,  # Center text
+                    bar.get_height(),  # Position at the top of the bar
+                    f'{value}',  # Value to display
+                    ha='center', va='bottom',  # Center horizontally and position above the bar
+                    fontsize=10, fontweight='bold', color='black'
+                )
+
             ax.set_title(f'Facility Distribution by {column}')
             ax.set_xlabel(column)
             ax.set_ylabel('Number of Facilities')
@@ -182,6 +196,7 @@ class FacilityView:
 
             inner_frame.update_idletasks()
             canvas.configure(scrollregion=canvas.bbox("all"))
+
 
         generate_button = tk.Button(inner_frame, text="Generate Graph", command=generate_graph)
         generate_button.pack()
