@@ -16,7 +16,7 @@ class FacilityController:
         self.view.update_facility_list()
         
     def get_facility_chart_data(self, column_name):
-        """Fetch facility type counts from the record list for plotting."""
+        """Fetch Column type and counts repeated instances from the record list for plotting."""
         column_counts  = {}
 
         for facility in self.model.record_list:

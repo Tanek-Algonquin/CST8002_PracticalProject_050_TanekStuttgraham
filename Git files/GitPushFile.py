@@ -18,7 +18,7 @@ if repo.is_dirty() or repo.untracked_files:
     repo.git.add(A=True)  # Add all changes (modified and untracked files)
     
     # Commit the changes
-    commit_message = "Added the column value to the top of the bar. V4.4"
+    commit_message = "Final Commit for Practical Project 4. V4.5"
     repo.index.commit(commit_message)
     
     # Print commit message

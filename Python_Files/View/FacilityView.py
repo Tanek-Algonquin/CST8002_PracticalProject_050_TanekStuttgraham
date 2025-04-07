@@ -81,13 +81,6 @@ class FacilityView:
             # Get the record data
             record = self.facility_tree.item(selected_item[0], "values")
             
-            # Print the selected record for debugging or inspection
-            print("Selected Record Data:", record)
-            
-            # If you want to print each field with its column name for clarity
-            for i, col_name in enumerate(self.displayed_columns):
-                print(f"{col_name}: {record[i]}")
-            
             self.generate_graph_from_record(record)  # Call method to generate graph for record
         else:
             # Create a window for manual column selection
@@ -97,23 +90,20 @@ class FacilityView:
         """Generate a bar graph using the data from a selected record, including only the max children and infant stats."""
         # Define graph window
         graph_window = tk.Toplevel(self.root)
-        graph_window.title(f"Facility Record Bar Graph for {record[0]}")  # Facility Name in title
+        graph_window.title(f"Facility Record Bar Graph for {record[0]} 041012512")  # Facility Name in title
         graph_window.geometry("800x500")
-
         # Define columns to include in the graph (max children and infant stats)
-        stats_columns = ["Children #", "Infant #", "P-A Child #", "S-A Child #"]
-
+        stats_columns = ["Children #", "Infant #", "P-A Child #", "S-A Child #", "Facilities #"]
+        #stats_columns = ["Facility Name", "Facility Type", "Facility Id", "Region", "District", "Main Add", "Province", "Postal", "Children #", "Infant #", "P-A Child #", "S-A Child #", "Language", "Op. Id", "Facilities #", "Licence #"]
         # Extract the data for these specific columns
         filtered_values = []
         for col in stats_columns:
             index = self.displayed_columns.index(col)  # Get index in displayed columns
             value = record[index]  # Get the corresponding value
             filtered_values.append(int(value) if str(value).isdigit() else 0)
-
         # Create bar graph
         fig, ax = plt.subplots(figsize=(8, 5))
         bars = ax.bar(stats_columns, filtered_values, color='blue')
-
         # Add values to bars so they sit exactly on top
         for bar, value in zip(bars, filtered_values):
             ax.text(bar.get_x() + bar.get_width() / 2,  # Centered on X-axis
@@ -121,10 +111,9 @@ class FacilityView:
                     f'{value}',  # Text to display
                     ha='center', va='bottom',  # Align text center & just above the bar
                     fontsize=10, fontweight='bold', color='black')
-
-        ax.set_title("Children and Infant Statistics")
-        ax.set_xlabel("Category")
-        ax.set_ylabel("Number of Facilities")
+        ax.set_title(f"Children and Infant Statistics for {record[0]}")
+        ax.set_xlabel("Category of Child")
+        ax.set_ylabel("Number of Children")
 
         plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
         fig.tight_layout()
@@ -133,9 +122,8 @@ class FacilityView:
         canvas_figure = FigureCanvasTkAgg(fig, master=graph_window)
         canvas_figure.draw()
         canvas_figure.get_tk_widget().pack(fill=tk.BOTH, expand=True)
-
-
-
+        
+        
     def create_graph_window(self):
         """Creates a window allowing the user to select a column for the bar graph."""
         graph_window = tk.Toplevel(self.root)
@@ -144,7 +132,6 @@ class FacilityView:
 
         frame = tk.Frame(graph_window)
         frame.pack(fill=tk.BOTH, expand=1)
-
         canvas = tk.Canvas(frame)
         canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
 
@@ -158,6 +145,7 @@ class FacilityView:
         canvas.create_window((0, 0), window=inner_frame, anchor="nw")
 
         column_options = ["facilityType", "region", "district", "LangOfService"]
+        #column_options = ["facilityName", "facilityType", "facilityId", "region", "district", "facilityAddress1", "facilityAddress2", "facilityAddress3", "maxNumofChildren", "maxNumofInfant", "maxNumPreChildren", "maxNumSAgeChildren", "LangOfService", "operatorId", "designatedFacility", "licenceNum"]
         selected_column = tk.StringVar(graph_window)
         selected_column.set(column_options[0])  # Default selection
 
@@ -167,6 +155,7 @@ class FacilityView:
         dropdown_menu.pack()
 
         def generate_graph():
+            """Generates a graph for the selected column for all records in record list."""
             column = selected_column.get()
             categories, values = self.controller.get_facility_chart_data(column)
 
@@ -196,7 +185,6 @@ class FacilityView:
 
             inner_frame.update_idletasks()
             canvas.configure(scrollregion=canvas.bbox("all"))
-
 
         generate_button = tk.Button(inner_frame, text="Generate Graph", command=generate_graph)
         generate_button.pack()
